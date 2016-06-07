@@ -35,7 +35,11 @@ public class ResourceUtilities {
     public static InputStream loadResource(String resourceFile) {
         InputStream stream = null;
         try {
-            String file = localResourceDir + resourceFile;
+            String file = resourceFile;
+            if(!resourceFile.startsWith("/")){
+                file = localResourceDir + resourceFile;
+            }
+
             // If the file doesn't exist locally it must be in the classpath (in common-resources
             // jar)
             if (!new File(file).exists()) {

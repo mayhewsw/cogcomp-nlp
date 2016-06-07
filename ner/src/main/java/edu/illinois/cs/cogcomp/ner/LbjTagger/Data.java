@@ -11,6 +11,8 @@
 package edu.illinois.cs.cogcomp.ner.LbjTagger;
 
 import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.TaggedDataReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ import java.util.Vector;
 
 
 public class Data {
+    private static final Logger logger = LoggerFactory.getLogger(Data.class);
     public String nickname;// this will be used to save the model to know on what dataset we have
                            // tuned....
     public String pathToData;
@@ -118,4 +121,19 @@ public class Data {
             }
         }
     }
+
+
+    /**
+     * This allows us to train from multiple folders.
+     * @param pathToData
+     * @param dataFormat
+     * @throws Exception
+     */
+    public void addFolderToData(String pathToData, String dataFormat) throws Exception {
+        logger.info("Adding folder to Data: " + pathToData);
+        Vector<NERDocument> docs=TaggedDataReader.readFolder(pathToData, dataFormat);
+        for(int i=0;i<docs.size();i++)
+            documents.add(docs.elementAt(i));
+    }
+
 }
