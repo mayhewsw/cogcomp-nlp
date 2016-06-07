@@ -21,6 +21,9 @@ import java.util.Collections;
 import java.util.Vector;
 
 public class ExpressiveFeaturesAnnotator {
+
+    public static boolean train;
+
     /**
      * Do not worry about the brown clusters and word embeddings, this stuff is added on the fly in
      * the .lbj feature generators...
