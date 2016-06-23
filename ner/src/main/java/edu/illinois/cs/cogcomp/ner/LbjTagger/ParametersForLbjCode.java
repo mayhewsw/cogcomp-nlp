@@ -54,6 +54,9 @@ public class ParametersForLbjCode {
     public boolean thresholdPrediction = false;
     public double predictionConfidenceThreshold = -1;
 
+    public String testlang;
+    public String trainlang;
+
     public boolean debug = false;
 
     public boolean sortLexicallyFilesInFolders = true;

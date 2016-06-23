@@ -14,14 +14,17 @@ import edu.illinois.cs.cogcomp.ner.InferenceMethods.Decoder;
 import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel1;
 import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel2;
 import edu.illinois.cs.cogcomp.ner.LbjTagger.*;
+import edu.illinois.cs.cogcomp.ner.WordEmbedding;
 import edu.illinois.cs.cogcomp.lbjava.parse.LinkedVector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Vector;
 
 public class ExpressiveFeaturesAnnotator {
-
+    private static Logger logger = LoggerFactory.getLogger(ExpressiveFeaturesAnnotator.class);
     public static boolean train;
 
     /**
@@ -125,6 +128,26 @@ public class ExpressiveFeaturesAnnotator {
                     ContextAggregation.annotate((NEWord) vector.get(j));
             }
         }
+
+        if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("Embedding")) {
+            logger.debug("Setting embeddings features...");
+            for(int docid=0;docid<data.documents.size();docid++) {
+                ArrayList<LinkedVector> sentences = data.documents.get(docid).sentences;
+                for(int i=0;i<sentences.size();i++){
+                    logger.debug("On sentence: " + i);
+                    LinkedVector vector=sentences.get(i);
+                    for(int j=0;j<vector.size();j++) {
+                        NEWord w = (NEWord) vector.get(j);
+                        if (train)
+                            w.wordvec = WordEmbedding.getWordVector(w.form, ParametersForLbjCode.currentParameters.trainlang);
+                        else
+                            w.wordvec = WordEmbedding.getWordVector(w.form, ParametersForLbjCode.currentParameters.testlang);
+                    }
+                }
+            }
+            logger.debug("Done setting embeddings features.");
+        }
+
 
         /*
          * Note that this piece of code must be the last!!! Here we are adding as features the

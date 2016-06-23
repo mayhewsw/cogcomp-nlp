@@ -45,7 +45,7 @@ public class Parameters {
             "Affixes", "PreviousTag1", "PreviousTag2", "PreviousTagPatternLevel1",
             "PreviousTagPatternLevel2", "AggregateContext", "AggregateGazetteerMatches",
             "PrevTagsForContext", "PredictionsLevel1", "GazetteersFeatures", "WordEmbeddings",
-            "BrownClusterPaths", "Linkability"};
+            "BrownClusterPaths", "Linkability", "Embedding"};
 
 
     /**
@@ -216,6 +216,13 @@ public class Parameters {
                     loadClassifierModels(aux);
                     param.auxiliaryModels.addElement(aux);
                 }
+            }
+
+            if(rm.containsKey("testlang")){
+                param.testlang = rm.getString("testlang");
+            }
+            if(rm.containsKey("trainlang")){
+                param.trainlang = rm.getString("trainlang");
             }
 
             if (rm.containsKey("normalizeTitleText")) {
