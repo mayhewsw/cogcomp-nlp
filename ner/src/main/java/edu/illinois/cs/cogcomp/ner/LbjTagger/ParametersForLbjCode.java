@@ -51,6 +51,7 @@ public class ParametersForLbjCode {
     // the predictions of these models will be the input to the classifier
     public Vector<ParametersForLbjCode> auxiliaryModels = new Vector<>();
 
+    // THESE ARE NEVER USED! They should be removed.
     public boolean thresholdPrediction = false;
     public double predictionConfidenceThreshold = -1;
 

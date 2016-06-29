@@ -143,10 +143,7 @@ public class ACLRunner {
         System.out.println(levels);
         System.out.println("Trained on: " + trainroot);
         System.out.println("Tested on: " + testroot);
-            
     }
-
-
 
 
     /**

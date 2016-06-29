@@ -180,7 +180,7 @@ public class Parameters {
                             || IOUtilities.existsInClasspath(NETaggerLevel2.class, modelFile2Lex);
 
             if (!file1Exists || !file1LexExists
-                    || (rm.containsKey("PredictionsLevel1") && (!file2Exists || !file2LexExists))) {
+                || (rm.containsKey("PredictionsLevel1") && rm.getString("PredictionsLevel1").equals("1") && (!file2Exists || !file2LexExists))) {
                 // if we are not training
                 if (!areWeTraining) {
                     throw new IllegalArgumentException("Config File Error: one of "
@@ -225,6 +225,11 @@ public class Parameters {
                 param.trainlang = rm.getString("trainlang");
             }
 
+            if(rm.containsKey("minConfidencePredictionsLevel1")){
+                param.minConfidencePredictionsLevel1 = rm.getDouble("minConfidencePredictionsLevel1");
+            }
+
+            
             if (rm.containsKey("normalizeTitleText")) {
                 param.normalizeTitleText = Boolean.parseBoolean(rm.getString("normalizeTitleText"));
             }

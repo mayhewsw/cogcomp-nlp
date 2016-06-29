@@ -8,7 +8,9 @@ LANG="tr"
 
 #TRAIN=/shared/corpora/ner/conll2003/eng/Train/
 #TRAIN=/shared/corpora/ner/parallel/$LANG/Train-bootstrap/
-TRAIN=/shared/corpora/ner/parallel/$LANG/Train-edit/,out/
+TRAIN=/shared/corpora/ner/parallel/$LANG/Train-edit/,out-fs/
+#TRAIN=out/
+#TRAIN=out-fs/
 #TRAIN=/shared/corpora/ner/parallel/$LANG/Train-fa/
 #TRAIN=/shared/corpora/ner/parallel/$LANG/Train-berk/
 #TEST=/shared/corpora/ner/lorelei/$LANG/Test/
