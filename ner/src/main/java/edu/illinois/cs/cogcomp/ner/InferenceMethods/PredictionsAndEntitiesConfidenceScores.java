@@ -35,6 +35,7 @@ public class PredictionsAndEntitiesConfidenceScores {
     public static void pruneLowConfidencePredictions(Data data, double minConfScore,
             NEWord.LabelToLookAt predictionsToLookAt) {
         Vector<NamedEntity> entities = getAndMarkEntities(data, predictionsToLookAt);
+        
         for (int i = 0; i < entities.size(); i++) {
             double confStart = -1;
             if (predictionsToLookAt.equals(NEWord.LabelToLookAt.PredictionLevel1Tagger))
@@ -52,7 +53,8 @@ public class PredictionsAndEntitiesConfidenceScores {
                 confEnd =
                         getMaxConfidence(entities.elementAt(i).tokens.elementAt(entities
                                 .elementAt(i).tokens.size() - 1).predictionConfidencesLevel2Classifier);
-            if (Math.sqrt(confEnd * confStart) < minConfScore)
+            //System.out.println(Math.sqrt(confEnd * confStart) + " ?? " + minConfScore);
+            if (Math.sqrt(confEnd * confStart) < minConfScore) {
                 for (int j = 0; j < entities.elementAt(i).tokens.size(); j++) {
                     if (predictionsToLookAt == NEWord.LabelToLookAt.PredictionLevel1Tagger)
                         entities.elementAt(i).tokens.elementAt(j).neTypeLevel1 = "O";
@@ -60,6 +62,7 @@ public class PredictionsAndEntitiesConfidenceScores {
                         entities.elementAt(i).tokens.elementAt(j).neTypeLevel2 = "O";
                     entities.elementAt(i).tokens.elementAt(j).predictedEntity = null;
                 }
+            }
         }
     }
 

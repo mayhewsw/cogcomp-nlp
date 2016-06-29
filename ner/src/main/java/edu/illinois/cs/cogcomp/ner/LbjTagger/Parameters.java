@@ -225,6 +225,11 @@ public class Parameters {
                 param.trainlang = rm.getString("trainlang");
             }
 
+            if(rm.containsKey("minConfidencePredictionsLevel1")){
+                param.minConfidencePredictionsLevel1 = rm.getDouble("minConfidencePredictionsLevel1");
+            }
+
+            
             if (rm.containsKey("normalizeTitleText")) {
                 param.normalizeTitleText = Boolean.parseBoolean(rm.getString("normalizeTitleText"));
             }
