@@ -35,7 +35,7 @@ public class NerTagger {
 
         ParametersForLbjCode cp = ParametersForLbjCode.currentParameters;
         try {
-            boolean areWeTraining = args[0].equalsIgnoreCase("-train");
+            boolean areWeTraining = args[0].startsWith("-train");
             Parameters.readConfigAndLoadExternalData(args[args.length - 1], areWeTraining);
 
             if (args[0].equalsIgnoreCase("-annotate")) {

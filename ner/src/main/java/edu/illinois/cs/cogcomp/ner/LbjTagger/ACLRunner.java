@@ -55,20 +55,17 @@ public class ACLRunner {
      * @return
      */
     public static String conllline(String tag, int num, String word){
-        return String.format("%s\t0\t%s\tx\tx\t%s\tx\tx\t0", tag, num, word);
+        return String.format("%s\t0\t%s\t0\t0\t%s\tx\tx\t0", tag, num, word);
     }
 
     public static final String dataroot = "/shared/corpora/ner/wikifier-features/";
-    public static final String config = "config/tac.config";
+    public static final String config = "config/mono.config";
 
     public static void main(String[] args) throws Exception {
 
         String lang = "tr";
-        //String goldpath = "/shared/corpora/ner/system-outputs/"+lang+"/hengji/";
-        String goldpath = "/shared/corpora/ner/hengji/"+lang+"/Test/";
-        //String predpath = "/shared/corpora/ner/system-outputs/"+lang+"/projection-fa/";
-//        String predpath = "/shared/corpora/ner/system-outputs/"+lang+"/transfer/";
-        String predpath = "/shared/corpora/ner/system-outputs/"+lang+"/combine/";
+        String predpath = "conllout/"; //"/shared/corpora/ner/parallel/"+lang+"/GoldPred/";
+        String goldpath = "/shared/corpora/ner/lorelei/"+lang+"/All/";
 
         //CompareWithGold(predpath, goldpath, lang);
 
@@ -125,19 +122,10 @@ public class ACLRunner {
         //String trainroot = "/shared/corpora/ner/parallel/" + lang + "/Train/";
         //String testroot = "/shared/corpora/ner/hengji/" + lang2 + "/Test/";
 
-        String[] ts = trainroot.split("/");
-        String traindir = ts[ts.length-1];
-
-        String[] tes = testroot.split("/");
-        String testdir = tes[tes.length-1];
 
         int trainiter = 30;
         String modelpath = ParametersForLbjCode.currentParameters.pathToModelFile;
-
-        //String modelpath = "data/Models-out/" + lang + "-" + trainiter + "iter-dir" + traindir;
-
         Data trainData = loaddata(trainroot, filesFormat, true);
-
         RunTraining(trainData, trainiter, modelpath);
         Pair<Double, Double> levels  = RunTest(testroot, modelpath, lang);
         System.out.println(levels);
@@ -195,6 +183,7 @@ public class ACLRunner {
         for(int i = 1; i < paths.length; i++){
             data.addFolderToData(paths[i], filesFormat);
         }
+
         ExpressiveFeaturesAnnotator.train = train;
         ExpressiveFeaturesAnnotator.annotate(data);
 
@@ -314,7 +303,7 @@ public class ACLRunner {
                 docpreds.add("");
             }
 
-            LineIO.write("/shared/corpora/ner/system-outputs/"+testlang+"/projection-fa/" + doc.docname, docpreds);
+            //LineIO.write("/shared/corpora/ner/system-outputs/"+testlang+"/projection-fa/" + doc.docname, docpreds);
         }
         //logger.info("Just wrote to: " + "/shared/corpora/ner/system-outputs/"+testlang+ "/projection-fa/");
 
@@ -532,9 +521,9 @@ public class ACLRunner {
         logger.info("docs in intersection: " + goldData.documents.size());
         logger.info("docs skipped: " + skipped );
 
-//        logger.info("IGNORING MISC LABEL IN EVAL");
-//        String[] labs = {"MISC"};
-//        goldData.setLabelsToIgnore(labs);
+        logger.info("IGNORING MISC LABEL IN EVAL");
+        String[] labs = {"MISC"};
+        goldData.setLabelsToIgnore(labs);
 
         TestDiscrete resultsPhraseLevel1 = new TestDiscrete();
         resultsPhraseLevel1.addNull("O");

@@ -45,7 +45,7 @@ public class Parameters {
             "Affixes", "PreviousTag1", "PreviousTag2", "PreviousTagPatternLevel1",
             "PreviousTagPatternLevel2", "AggregateContext", "AggregateGazetteerMatches",
             "PrevTagsForContext", "PredictionsLevel1", "GazetteersFeatures", "WordEmbeddings",
-            "BrownClusterPaths", "Linkability", "Embedding"};
+            "BrownClusterPaths", "Linkability", "Embedding", "DumbStems"};
 
 
     /**
@@ -360,6 +360,7 @@ public class Parameters {
 
                 // Check that vectors are all the same length
                 int standard = pathsToBrownClusters.size();
+                //System.out.println(standard + " " + minWordAppThresholdsForBrownClusters.size() + " " + lowercaseBrown.size());
                 if (minWordAppThresholdsForBrownClusters.size() != standard
                         || lowercaseBrown.size() != standard) {
                     throw new IllegalArgumentException(
@@ -380,6 +381,8 @@ public class Parameters {
                                     + "\n";
                     brownDebug += "\t-IsLowercased=" + lowercaseBrown.elementAt(i) + "\n";
                 }
+
+                System.out.println(brownDebug);
 
             }
 
