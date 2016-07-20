@@ -6,8 +6,12 @@ import edu.illinois.cs.cogcomp.ner.InferenceMethods.Decoder;
 import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel1;
 import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel2;
 import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.PlainTextReader;
+import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.TaggedDataReader;
+import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.TaggedDataWriter;
+import edu.illinois.cs.cogcomp.lbjava.learn.Lexicon;
+import edu.illinois.cs.cogcomp.nlp.corpusreaders.CoNLLColumnFormatReader;
 
-import java.io.File;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.*;
@@ -18,7 +22,7 @@ import java.util.*;
 @SuppressWarnings("Duplicates")
 public class SelfTrainer {
 
-    public static final String config = "config/self-train.config";
+    public static final String config = "/home/mayhew2/IdeaProjects/transliteration-ner/config/eval.config";
 
     /**
      * Given a datapath, load the model and annotate the data, and write it out to outpath.
@@ -35,6 +39,8 @@ public class SelfTrainer {
         Parameters.readConfigAndLoadExternalData(config, false);
         
         String modelPath = ParametersForLbjCode.currentParameters.pathToModelFile;
+        NETaggerLevel1 tagger1 = new NETaggerLevel1(modelPath + ".level1", modelPath + ".level1.lex");
+        NETaggerLevel2 tagger2 = new NETaggerLevel2(modelPath + ".level2", modelPath + ".level2.lex");
 
         File dir = new File(dataPath);
         String[] files = dir.list();
@@ -48,8 +54,6 @@ public class SelfTrainer {
             data.documents.add(doc);
         }
 
-        NETaggerLevel1 tagger1 = new NETaggerLevel1(modelPath + ".level1", modelPath + ".level1.lex");
-        NETaggerLevel2 tagger2 = new NETaggerLevel2(modelPath + ".level2", modelPath + ".level2.lex");
 
         Decoder.annotateDataBIO(data, tagger1, tagger2);
 
@@ -118,9 +122,99 @@ public class SelfTrainer {
 
     }
 
+
+    /**
+     * Given a folder that contains conll files, this will annotate all files in the directory
+     * and write the result out to file. This is intended to be used in self-training, e.g. annotating
+     * the testing data.
+     * @param path
+     * @throws Exception
+     */
+    public static void reannotate(String path, String goldpredpath) throws Exception {
+        Parameters.readConfigAndLoadExternalData(config, false);
+
+        String modelPath = ParametersForLbjCode.currentParameters.pathToModelFile;
+        NETaggerLevel1 tagger1 = new NETaggerLevel1(modelPath + ".level1", modelPath + ".level1.lex");
+        NETaggerLevel2 tagger2 = new NETaggerLevel2(modelPath + ".level2", modelPath + ".level2.lex");
+
+        Data data = new Data();
+        Vector<NERDocument> docs = TaggedDataReader.readFolder(path, "-c");
+        data.documents = new ArrayList<>();
+        data.documents.addAll(docs);
+
+        Decoder.annotateDataBIO(data, tagger1, tagger2);
+
+        for(NERDocument doc : data.documents) {
+
+            ArrayList<LinkedVector> sentences = doc.sentences;
+            for (int k = 0; k < sentences.size(); k++){
+                for (int i = 0; i < sentences.get(k).size() ; ++i){
+                    NEWord w = (NEWord)sentences.get(k).get(i);
+                    if(w.neTypeLevel2.equals("O")){
+                        w.neTypeLevel2 = w.neLabel;
+                    }                    
+                }
+            }
+
+
+        }
+        
+        // then write out to another file?
+        TaggedDataWriter.writeToFile("tr-output.conll", data, "-c", NEWord.LabelToLookAt.PredictionLevel2Tagger);
+
+        data = new Data();
+        docs = TaggedDataReader.readFolder(goldpredpath, "-c");
+        data.documents = new ArrayList<>();
+        data.documents.addAll(docs);
+
+        Decoder.annotateDataBIO(data, tagger1, tagger2);
+        TaggedDataWriter.writeToFolder("conllout/", data, "-c", NEWord.LabelToLookAt.PredictionLevel2Tagger);
+
+
+    }
+
+    public static void annotatefolder(String path, String outpath) throws Exception {
+
+        String config = "config/mono.config";
+
+        Parameters.readConfigAndLoadExternalData(config, false);
+
+        String modelPath = ParametersForLbjCode.currentParameters.pathToModelFile;
+        NETaggerLevel1 tagger1 = new NETaggerLevel1(modelPath + ".level1", modelPath + ".level1.lex");
+        NETaggerLevel2 tagger2 = new NETaggerLevel2(modelPath + ".level2", modelPath + ".level2.lex");
+
+
+        String[] p = (new File(path)).list();
+        for(String f : p){
+            Data data = new Data();
+            NERDocument doc = TaggedDataReader.readFile(path + "/" + f, "-c", f);
+            //Vector<NERDocument> docs  = TaggedDataReader.readFolder(path, "-c");
+            data.documents = new ArrayList<>();
+            data.documents.add(doc);
+
+            Decoder.annotateDataBIO(data, tagger1, tagger2);
+            TaggedDataWriter.writeToFile(outpath + "/" + f, data, "-c", NEWord.LabelToLookAt.PredictionLevel2Tagger);
+            //TaggedDataWriter.writeToFolder(outpath, data, "-c", NEWord.LabelToLookAt.PredictionLevel2Tagger);
+
+        }
+
+    }
+
+
+
     public static void main(String[] args) throws Exception {
-        SelfTrainer.makeNewData("/shared/corpora/corporaWeb/lorelei/turkish/tools/ltf2txt/full_short/", "out-fs/");
-        //SelfTrainer.makeNewData("/shared/corpora/ner/mono/tr/tr100/","out-wiki/");
+        //SelfTrainer.makeNewData("/shared/corpora/corporaWeb/lorelei/turkish/tools/ltf2txt/full_short/", "out-fs/");
+        //SelfTrainer.annotatefolder("/shared/corpora/ner/eval/column/set0-mono-NW/","out-set0-NW/");
+
+        String dir = "/shared/corpora/ner/wikifier-features/ug/";
+        SelfTrainer.annotatefolder(dir + "iter10-NW-correct", dir + "iter10-NW-correct-koran/");
+
+        //getFeatureWeights();
+        
+        //String datadir = "/shared/corpora/ner/parallel/tr/";
+
+        //reannotate(datadir + "Train-edit/", datadir + "GoldPred/");
+
     }
 
 

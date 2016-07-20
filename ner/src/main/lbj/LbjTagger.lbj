@@ -3,6 +3,7 @@ package edu.illinois.cs.cogcomp.ner.LbjFeatures;
 import java.util.*;
 
 import edu.illinois.cs.cogcomp.ner.LbjTagger.NEWord;
+import edu.illinois.cs.cogcomp.ner.LanguageSpecificNormalizer;
 import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.WordTopicAndLayoutFeatures;
 import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.BrownClusters;
 import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.Gazetteers;
@@ -368,6 +369,18 @@ discrete% Forms(NEWord word) <-
 	}
 }
 
+discrete% DumbStems(NEWord word) <-
+{
+  	if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("DumbStems"))
+	{
+         List stems = LanguageSpecificNormalizer.turkish(word.form);
+         for(int i = 0; i < stems.size(); i++){
+             sense stems.get(i);
+         }
+	}
+}
+
+
 //real% Linkability(NEWord word) <-
 //{
 //  	if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("Linkability"))
@@ -660,7 +673,7 @@ discrete% PreviousTagPatternLevel1(NEWord word) <-
 }
 
 
-mixed% FeaturesSharedTemp(NEWord word) 	<-	IsSentenceStart, Capitalization, nonLocalFeatures, GazetteersFeatures, FormParts, Forms,  WordTypeInformation, Affixes, BrownClusterPaths, WordEmbeddingFeatures, posTag, wikifierFeats, PrevEmbedding, NextEmbedding, CurrentEmbedding
+mixed% FeaturesSharedTemp(NEWord word) 	<-	IsSentenceStart, Capitalization, nonLocalFeatures, GazetteersFeatures, FormParts, Forms,  WordTypeInformation, Affixes, BrownClusterPaths, WordEmbeddingFeatures, posTag, wikifierFeats, PrevEmbedding, NextEmbedding, CurrentEmbedding, DumbStems
 
 
 mixed% FeaturesLevel1SharedWithLevel2(NEWord word)  <- FeaturesSharedTemp /*,  IsWordCaseNormalized&&FeaturesSharedTemp*/

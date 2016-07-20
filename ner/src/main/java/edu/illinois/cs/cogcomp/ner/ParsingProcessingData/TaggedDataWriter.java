@@ -12,6 +12,7 @@ package edu.illinois.cs.cogcomp.ner.ParsingProcessingData;
 
 import edu.illinois.cs.cogcomp.ner.IO.OutFile;
 import edu.illinois.cs.cogcomp.ner.LbjTagger.Data;
+import edu.illinois.cs.cogcomp.ner.LbjTagger.NERDocument;
 import edu.illinois.cs.cogcomp.ner.LbjTagger.NEWord;
 import edu.illinois.cs.cogcomp.lbjava.parse.LinkedVector;
 
@@ -33,6 +34,26 @@ public class TaggedDataWriter {
         }
         out.close();
     }
+
+    public static void writeToFolder(String outputFolder, Data data, String fileFormat,
+                                   NEWord.LabelToLookAt labelType) throws IOException {
+
+        for(NERDocument doc : data.documents) {
+            OutFile out = new OutFile(outputFolder + "/" + doc.docname);
+
+            if (fileFormat.equalsIgnoreCase("-r"))
+                System.out.println("SORRY NOT AVAILABLE!");
+            else if (fileFormat.equalsIgnoreCase("-c"))
+                out.println(toColumnsFormat(doc, labelType));
+            else {
+                throw new IOException(
+                        "Unknown file format (only options -r and -c are supported): " + fileFormat);
+            }
+
+            out.close();
+        }
+    }
+
 
     /*
      * labelType=NEWord.GoldLabel/NEWord.PredictionLevel2Tagger/NEWord.PredictionLevel1Tagger
@@ -108,4 +129,30 @@ public class TaggedDataWriter {
         }
         return res.toString();
     }
+
+    /**
+     * This just takes a single document.
+     * @param doc
+     * @param labelType
+     * @return
+     */
+    private static String toColumnsFormat(NERDocument doc, NEWord.LabelToLookAt labelType) {
+        StringBuilder res = new StringBuilder(doc.sentences.size() * 100);
+
+        for (int i = 0; i < doc.sentences.size(); i++) {
+            LinkedVector vector = doc.sentences.get(i);
+            if (((NEWord) vector.get(0)).previousIgnoreSentenceBoundary == null)
+                res.append("O	0	0	O	-X-	-DOCSTART-	x	x	0\n\n");
+            for (int j = 0; j < vector.size(); j++) {
+                NEWord w = (NEWord) vector.get(j);
+                res.append(w.getPrediction(labelType)).append("\t0\t").append(j)
+                        .append("\tO\tO\t").append(w.form).append("\tx\tx\t0\n");
+            }
+            res.append("\n");
+        }
+
+        return res.toString();
+    }
+
+
 }
