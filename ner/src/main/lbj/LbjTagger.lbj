@@ -1,15 +1,15 @@
-package edu.illinois.cs.cogcomp.LbjNer.LbjFeatures;
+package edu.illinois.cs.cogcomp.ner.LbjFeatures;
 
 import java.util.*;
 
-import edu.illinois.cs.cogcomp.LbjNer.LbjTagger.NEWord;
-import edu.illinois.cs.cogcomp.LbjNer.ExpressiveFeatures.WordTopicAndLayoutFeatures;
-import edu.illinois.cs.cogcomp.LbjNer.ExpressiveFeatures.BrownClusters;
-import edu.illinois.cs.cogcomp.LbjNer.ExpressiveFeatures.Gazetteers;
-import edu.illinois.cs.cogcomp.LbjNer.ExpressiveFeatures.WordEmbeddings;
-import edu.illinois.cs.cogcomp.LbjNer.LbjTagger.ParametersForLbjCode;
-import edu.illinois.cs.cogcomp.LbjNer.StringStatisticsUtils.*;
-import edu.illinois.cs.cogcomp.LbjNer.WordEmbedding;
+import edu.illinois.cs.cogcomp.ner.LbjTagger.NEWord;
+import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.WordTopicAndLayoutFeatures;
+import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.BrownClusters;
+import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.Gazetteers;
+import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.WordEmbeddings;
+import edu.illinois.cs.cogcomp.ner.LbjTagger.ParametersForLbjCode;
+import edu.illinois.cs.cogcomp.ner.StringStatisticsUtils.*;
+import edu.illinois.cs.cogcomp.ner.WordEmbedding;
 
   
 //---------------- CLASSIFIER LEVEL 1 -------------------
@@ -755,7 +755,7 @@ real% prevTagsForContextLevel2(NEWord word) <-
 	}
 }
 
-real% level1AggregationFeatures(NEWord word) <-
+real% Level1AggregationFeatures(NEWord word) <-
 {
         if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("PredictionsLevel1")){
         	for(int i=0;i<word.getLevel1AggregationFeatures().size();i++){
@@ -818,7 +818,7 @@ discrete% PreviousTagPatternLevel2(NEWord word) <-
 
 
 
-mixed% FeaturesLevel2(NEWord word) <-   PreviousTagPatternLevel2, level1AggregationFeatures,  PreviousTag1Level2, PreviousTag2Level2 ,  prevTagsForContextLevel2, PreviousTag1Level2&&Forms /* PreviousTag1Level2&&BrownClusterPaths, PreviousTag1Level2&&WordEmbeddingFeatures, PreviousTag1Level2&&HmmEmbeddingFeatures,  PreviousTag1Level2&&additionalFeaturesDiscreteConjunctive, PreviousTag1Level2&&additionalFeaturesRealConjunctive*/
+mixed% FeaturesLevel2(NEWord word) <-   PreviousTagPatternLevel2, Level1AggregationFeatures,  PreviousTag1Level2, PreviousTag2Level2 ,  prevTagsForContextLevel2, PreviousTag1Level2&&Forms /* PreviousTag1Level2&&BrownClusterPaths, PreviousTag1Level2&&WordEmbeddingFeatures, PreviousTag1Level2&&HmmEmbeddingFeatures,  PreviousTag1Level2&&additionalFeaturesDiscreteConjunctive, PreviousTag1Level2&&additionalFeaturesRealConjunctive*/
 																	
 
 discrete NETaggerLevel2(NEWord word)  <-

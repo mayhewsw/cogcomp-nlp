@@ -102,11 +102,6 @@ gazetteers/Weapons.Torpedoes.gz
 /shared/corpora/ner/gazetteers/uz/org
 /shared/corpora/ner/gazetteers/uz/per
 /shared/corpora/ner/gazetteers/uz/song
-/shared/corpora/ner/gazetteers/bn/film
-/shared/corpora/ner/gazetteers/bn/loc
-/shared/corpora/ner/gazetteers/bn/org
-/shared/corpora/ner/gazetteers/bn/per
-/shared/corpora/ner/gazetteers/bn/song
 /shared/corpora/ner/gazetteers/ha/film
 /shared/corpora/ner/gazetteers/ha/loc
 /shared/corpora/ner/gazetteers/ha/org
@@ -117,3 +112,8 @@ gazetteers/Weapons.Torpedoes.gz
 /shared/corpora/ner/gazetteers/en/org
 /shared/corpora/ner/gazetteers/en/per
 /shared/corpora/ner/gazetteers/en/song
+/shared/corpora/ner/gazetteers/bn/film
+/shared/corpora/ner/gazetteers/bn/loc
+/shared/corpora/ner/gazetteers/bn/org
+/shared/corpora/ner/gazetteers/bn/per
+/shared/corpora/ner/gazetteers/bn/song

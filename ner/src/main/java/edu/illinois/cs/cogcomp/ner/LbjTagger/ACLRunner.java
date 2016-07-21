@@ -16,6 +16,7 @@ import edu.illinois.cs.cogcomp.ner.InferenceMethods.Decoder;
 import edu.illinois.cs.cogcomp.ner.InferenceMethods.PredictionsAndEntitiesConfidenceScores;
 import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel1;
 import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel2;
+import edu.illinois.cs.cogcomp.ner.WordEmbedding;
 import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.TaggedDataReader;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -62,12 +63,16 @@ public class ACLRunner {
 
     public static void main(String[] args) throws Exception {
 
+        String lang = "tr";
+        //String goldpath = "/shared/corpora/ner/system-outputs/"+lang+"/hengji/";
+        String goldpath = "/shared/corpora/ner/hengji/"+lang+"/Test/";
+        //String predpath = "/shared/corpora/ner/system-outputs/"+lang+"/projection-fa/";
+//        String predpath = "/shared/corpora/ner/system-outputs/"+lang+"/transfer/";
+        String predpath = "/shared/corpora/ner/system-outputs/"+lang+"/combine/";
+
         //CompareWithGold(predpath, goldpath, lang);
 
-        String lang = "en";
-        String goldpath = "/shared/corpora/ner/wikifier-features/en/Test-go-4types/"; //"/shared/corpora/ner/parallel/"+lang+"/Train-project/";
-        String predpath = "/shared/corpora/ner/wikifier-features/en/Test-go-4types/";
-        singlelang(goldpath, predpath, lang);
+        singlelang(args[0], args[1], args[2]);
 
         //multisource(args[0], args[1], args[2]);
     }
@@ -89,8 +94,8 @@ public class ACLRunner {
             trainroot += dataroot + trainlang + "/Train-new/,";
         }
 
-        //Data trainData = loaddata(trainroot, filesFormat, true);
-        //RunTraining(trainData, trainiter, modelpath);
+        Data trainData = loaddata(trainroot, filesFormat, true);
+        RunTraining(trainData, trainiter, modelpath);
         Pair<Double, Double> levels  = RunTest(testroot, modelpath, testlang);
         System.out.println(levels);
     }
@@ -103,6 +108,13 @@ public class ACLRunner {
     public static void singlelang(String trainroot, String testroot, String lang) throws Exception {
         boolean areWeTraining = true;
         Parameters.readConfigAndLoadExternalData(config, areWeTraining);
+
+        if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("Embedding")) {
+            if(ParametersForLbjCode.currentParameters.testlang.equals("en"))
+                WordEmbedding.setMonoVecsNew("en");
+            else
+                WordEmbedding.loadMultiDBNew(ParametersForLbjCode.currentParameters.testlang);
+        }
 
         //String lang = "tr";
         //String lang2 = "tur";
@@ -133,6 +145,9 @@ public class ACLRunner {
         System.out.println("Tested on: " + testroot);
             
     }
+
+
+
 
     /**
      * Use this to train a model for each language, and then test it on each language.
@@ -262,7 +277,6 @@ public class ACLRunner {
         logger.info("Training...");
         bt1train.train(fixedNumIterations);
 
-
         NETaggerLevel2 tagger2 = new NETaggerLevel2(modelPath + ".level2", modelPath + ".level2.lex");
         tagger2.forget();
 
@@ -273,7 +287,6 @@ public class ACLRunner {
             BatchTrainer bt2train = prefetchAndGetBatchTrainer(tagger2, trainData, modelPath + ".level2.prefetchedTrainData");
 
             bt2train.train(fixedNumIterations);
-
         }
 
         logger.info("Saving model to path: " + modelPath);
@@ -304,7 +317,7 @@ public class ACLRunner {
                 docpreds.add("");
             }
 
-            //LineIO.write("/shared/corpora/ner/system-outputs/"+testlang+"/projection-fa/" + doc.docname, docpreds);
+            LineIO.write("/shared/corpora/ner/system-outputs/"+testlang+"/projection-fa/" + doc.docname, docpreds);
         }
         //logger.info("Just wrote to: " + "/shared/corpora/ner/system-outputs/"+testlang+ "/projection-fa/");
 
@@ -466,37 +479,40 @@ public class ACLRunner {
                         }
                         comparison.add("");
 
-                        for(Pair<Integer, Integer> pred : predspans){
-                            int a1 = pred.getFirst();
-                            int a2 = pred.getSecond();
-                            boolean overlap = false;
-                            for(Pair<Integer, Integer> gold : goldspans){
-                                int b1 = gold.getFirst();
-                                int b2 = gold.getSecond();
-                                if((a1 >= b1 && a1 <= b2) || (a2 >= b1 && a2 <= b2)){
-                                    overlap = true;
-                                    // overlap is true
-                                    // set labels of predspan to label of gold span.
-                                    NEWord w = (NEWord) sentences.get(k).get(b1);
-                                    String goldlabel = w.neLabel.split("-")[1];
-
-                                    for(int i = a1; i <= a2; i++){
-                                        NEWord pw = (NEWord) sentences.get(k).get(i);
-                                        pw.neTypeLevel1 = i==a1 ? "B-" + goldlabel : "I-" + goldlabel;
-                                    }
-                                }
-                            }
-
-                            // if no overlap...
-                            if (!overlap) {
-                                for (int i = a1; i < a2; i++) {
-                                    NEWord pw = (NEWord) sentences.get(k).get(i);
-                                    pw.neTypeLevel1 = "O";
-                                }
-                            }
-
-
-                        }
+                        // This code simulates what would happen if we "correct" the label of
+                        // every predicted span that overlaps with a Gold span. This simulates
+                        // the corrective actions of a native informant.
+//                        for(Pair<Integer, Integer> pred : predspans){
+//                            int a1 = pred.getFirst();
+//                            int a2 = pred.getSecond();
+//                            boolean overlap = false;
+//                            for(Pair<Integer, Integer> gold : goldspans){
+//                                int b1 = gold.getFirst();
+//                                int b2 = gold.getSecond();
+//                                if((a1 >= b1 && a1 <= b2) || (a2 >= b1 && a2 <= b2)){
+//                                    overlap = true;
+//                                    // overlap is true
+//                                    // set labels of predspan to label of gold span.
+//                                    NEWord w = (NEWord) sentences.get(k).get(b1);
+//                                    String goldlabel = w.neLabel.split("-")[1];
+//
+//                                    for(int i = a1; i <= a2; i++){
+//                                        NEWord pw = (NEWord) sentences.get(k).get(i);
+//                                        pw.neTypeLevel1 = i==a1 ? "B-" + goldlabel : "I-" + goldlabel;
+//                                    }
+//                                }
+//                            }
+//
+//                            // if no overlap...
+//                            if (!overlap) {
+//                                for (int i = a1; i < a2; i++) {
+//                                    NEWord pw = (NEWord) sentences.get(k).get(i);
+//                                    pw.neTypeLevel1 = "O";
+//                                }
+//                            }
+//
+//
+//                        }
 
 
                     }
