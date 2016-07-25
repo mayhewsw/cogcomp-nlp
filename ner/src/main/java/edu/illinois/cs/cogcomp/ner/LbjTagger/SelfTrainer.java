@@ -8,8 +8,7 @@ import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel2;
 import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.PlainTextReader;
 import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.TaggedDataReader;
 import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.TaggedDataWriter;
-import edu.illinois.cs.cogcomp.lbjava.learn.Lexicon;
-import edu.illinois.cs.cogcomp.nlp.corpusreaders.CoNLLColumnFormatReader;
+
 
 import java.io.*;
 import java.util.ArrayList;
