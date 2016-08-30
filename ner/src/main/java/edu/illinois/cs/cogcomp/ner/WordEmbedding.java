@@ -31,7 +31,6 @@ public class WordEmbedding {
 
     public static String dbpath = "/shared/preprocessed/ctsai12/multilingual/mapdb";
 
-
     public WordEmbedding() {
 
     }
@@ -163,7 +162,6 @@ public class WordEmbedding {
 
     public static Double[] getWordVector(String word, String lang){
         if(!multi_vecs.containsKey(lang)){
-            System.out.println(multi_vecs);
             System.err.println("Couldn't find word embeddings for "+lang);
             System.exit(-1);
         }

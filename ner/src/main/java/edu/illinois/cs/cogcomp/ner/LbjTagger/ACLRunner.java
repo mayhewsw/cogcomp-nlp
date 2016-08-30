@@ -37,6 +37,14 @@ public class ACLRunner {
     public static String[] langs = {"en", "es", "de", "nl", "tr", "uz", "bn", "ha"};
     public static final String filesFormat = "-c";
 
+    // these do not have a MISC tag, so skip it in evaluation.
+//    public static HashSet<String> lorlangs = new HashSet<>();
+//    {
+//        lorlangs.add("bn");
+//        lorlangs.add("tr");
+//        lorlangs.add("ha");
+//        lorlangs.add("uz");
+//    }
 
     /**
      * Convenience function to avoid having to think about this format all the time...
@@ -50,19 +58,18 @@ public class ACLRunner {
     }
 
     public static final String dataroot = "/shared/corpora/ner/wikifier-features/";
-    public static String config = null;
+
+    public static final String config = "config/mono.config";
 
     public static void main(String[] args) throws Exception {
 
-        String lang = "uzug";
-        String predpath = "/shared/corpora/ner/wikifier-features/ug/cp3/dev2-gaz/";
-        String goldpath = "/shared/corpora/ner/eval/column/dev2/";
+        String lang = "tr";
+        String predpath = "conllout/"; //"/shared/corpora/ner/parallel/"+lang+"/GoldPred/";
+        String goldpath = "/shared/corpora/ner/lorelei/"+lang+"/All/";
 
-        CompareWithGold(predpath, goldpath, lang);
+        //CompareWithGold(predpath, goldpath, lang);
 
-        // train, test, lang, config
-//        config = args[3];
-//        singlelang(args[0], args[1], args[2], args[3]);
+        singlelang(args[0], args[1], args[2]);
 
         //multisource(args[0], args[1], args[2]);
     }
@@ -111,6 +118,7 @@ public class ACLRunner {
         Data trainData = loaddata(trainroot, filesFormat, true);
         RunTraining(trainData, trainiter, modelpath);
         Pair<Double, Double> levels  = RunTest(testroot, modelpath, lang);
+
         System.out.println("Trained on: " + trainroot);
         System.out.println("Tested on: " + testroot);
     }

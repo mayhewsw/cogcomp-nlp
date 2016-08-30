@@ -181,6 +181,7 @@ public class Parameters {
 
             if (!file1Exists || !file1LexExists
                     || (rm.containsKey("PredictionsLevel1") && rm.getString("PredictionsLevel1").equals("1") && (!file2Exists || !file2LexExists))) {
+
                 // if we are not training
                 if (!areWeTraining) {
                     throw new IllegalArgumentException("Config File Error: one of "

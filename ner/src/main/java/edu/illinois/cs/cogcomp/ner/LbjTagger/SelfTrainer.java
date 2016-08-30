@@ -9,6 +9,8 @@ import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.PlainTextReader;
 import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.TaggedDataReader;
 import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.TaggedDataWriter;
 
+import edu.illinois.cs.cogcomp.lbjava.learn.Lexicon;
+import edu.illinois.cs.cogcomp.nlp.corpusreaders.CoNLLColumnFormatReader;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -182,6 +184,7 @@ public class SelfTrainer {
         String modelPath = ParametersForLbjCode.currentParameters.pathToModelFile;
         NETaggerLevel1 tagger1 = new NETaggerLevel1(modelPath + ".level1", modelPath + ".level1.lex");
         NETaggerLevel2 tagger2 = new NETaggerLevel2(modelPath + ".level2", modelPath + ".level2.lex");
+
 
         String[] p = (new File(path)).list();
         for(String f : p){
