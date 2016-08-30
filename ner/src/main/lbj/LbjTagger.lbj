@@ -97,6 +97,10 @@ real% CurrentEmbedding(NEWord word) <-
                 Double f = word.wordvec[i];
                 sense "CCAWordEmbedding" + i : f;
             }
+        }else{
+           for(int i = 0; i < 100; i++){
+                  sense "CCAWordEmbedding" + i : 0.0;
+           }
         }
 	}
 }
@@ -517,18 +521,27 @@ discrete{false, true}% WordTypeInformation(NEWord word) <-
 // Feature set iii
 discrete% Affixes(NEWord word) <-
 {
-	if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("Affixes"))
-	{ 
-  		int N = word.form.length();
-	  	for (int i = 3; i <= 4; ++i)
-    		if (word.form.length() > i) sense "p|" : word.form.substring(0, i);
-  		for (int i = 1; i <= 4; ++i)
-    		if (word.form.length() > i) sense "s|" : word.form.substring(N - i);
-		
-		if(ParametersForLbjCode.currentParameters.tokenizationScheme.equals(ParametersForLbjCode.TokenizationScheme.DualTokenizationScheme))	
-			for(int i=0;i<word.parts.length;i++)
-				sense "part"+i : word.parts[i];
 
+	if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("Affixes"))
+	{
+
+        int j=0;
+        NEWord w = word, last = word;
+        for (j = 0; j <= 2 && last != null; ++j) last = (NEWord) last.next;
+        for (j = 0; j > -2 && w.previous != null; --j) w = (NEWord) w.previous;
+
+	    for (; w != last; w = (NEWord) w.next){
+	      		int N = w.form.length();
+        	  	for (int i = 3; i <= 4; ++i)
+            		if (N > i) sense "p"+ j +"|" : w.form.substring(0, i);
+          		for (int i = 2; i <= 4; ++i)
+            		if (N > i) sense "s"+ j +"|" : w.form.substring(N - i);
+                j++;
+	    }
+
+        if(ParametersForLbjCode.currentParameters.tokenizationScheme.equals(ParametersForLbjCode.TokenizationScheme.DualTokenizationScheme))
+            for(int i=0;i<word.parts.length;i++)
+                sense "part"+i : word.parts[i];
 	}
 }
 

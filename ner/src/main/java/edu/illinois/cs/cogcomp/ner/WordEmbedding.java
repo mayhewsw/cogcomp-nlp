@@ -26,10 +26,10 @@ public class WordEmbedding {
     private static DB multi_db;
     public static int dim;
     private static Map<String, Double[]> vec_cache = new HashMap<>();
-    private static boolean use_mcache = true;
+    private static boolean use_mcache = false;
     public String lang;
 
-    public static String dbpath = "/shared/dickens/ctsai12/multilingual/mapdb";
+    public static String dbpath = "/shared/preprocessed/ctsai12/multilingual/mapdb";
 
 
     public WordEmbedding() {
@@ -163,6 +163,7 @@ public class WordEmbedding {
 
     public static Double[] getWordVector(String word, String lang){
         if(!multi_vecs.containsKey(lang)){
+            System.out.println(multi_vecs);
             System.err.println("Couldn't find word embeddings for "+lang);
             System.exit(-1);
         }

@@ -37,15 +37,6 @@ public class ACLRunner {
     public static String[] langs = {"en", "es", "de", "nl", "tr", "uz", "bn", "ha"};
     public static final String filesFormat = "-c";
 
-    // these do not have a MISC tag, so skip it in evaluation.
-//    public static HashSet<String> lorlangs = new HashSet<>();
-//    {
-//        lorlangs.add("bn");
-//        lorlangs.add("tr");
-//        lorlangs.add("ha");
-//        lorlangs.add("uz");
-//    }
-
 
     /**
      * Convenience function to avoid having to think about this format all the time...
@@ -59,17 +50,19 @@ public class ACLRunner {
     }
 
     public static final String dataroot = "/shared/corpora/ner/wikifier-features/";
-    public static final String config = "config/mono.config";
+    public static String config = null;
 
     public static void main(String[] args) throws Exception {
 
-        String lang = "tr";
-        String predpath = "conllout/"; //"/shared/corpora/ner/parallel/"+lang+"/GoldPred/";
-        String goldpath = "/shared/corpora/ner/lorelei/"+lang+"/All/";
+        String lang = "uzug";
+        String predpath = "/shared/corpora/ner/wikifier-features/ug/cp3/dev2-gaz/";
+        String goldpath = "/shared/corpora/ner/eval/column/dev2/";
 
-        //CompareWithGold(predpath, goldpath, lang);
+        CompareWithGold(predpath, goldpath, lang);
 
-        singlelang(args[0], args[1], args[2]);
+        // train, test, lang, config
+//        config = args[3];
+//        singlelang(args[0], args[1], args[2], args[3]);
 
         //multisource(args[0], args[1], args[2]);
     }
@@ -113,22 +106,11 @@ public class ACLRunner {
                 WordEmbedding.loadMultiDBNew(ParametersForLbjCode.currentParameters.testlang);
         }
 
-        //String lang = "tr";
-        //String lang2 = "tur";
-
-        //String trainroot = dataroot + trainlang + "/Train-new-mono/";
-        //String testroot = dataroot + testlang + "/Test-new-mono/";
-
-        //String trainroot = "/shared/corpora/ner/parallel/" + lang + "/Train/";
-        //String testroot = "/shared/corpora/ner/hengji/" + lang2 + "/Test/";
-
-
         int trainiter = 30;
         String modelpath = ParametersForLbjCode.currentParameters.pathToModelFile;
         Data trainData = loaddata(trainroot, filesFormat, true);
         RunTraining(trainData, trainiter, modelpath);
         Pair<Double, Double> levels  = RunTest(testroot, modelpath, lang);
-        System.out.println(levels);
         System.out.println("Trained on: " + trainroot);
         System.out.println("Tested on: " + testroot);
     }
@@ -297,7 +279,9 @@ public class ACLRunner {
             for (int k = 0; k < sentences.size(); k++){
                 for (int i = 0; i < sentences.get(k).size() ; ++i){
                     NEWord w = (NEWord)sentences.get(k).get(i);
-                    results.add(w.form + "\t" + w.neLabel + "\t" + w.neTypeLevel2);
+                    if(!w.neLabel.equals(w.neTypeLevel2)) {
+                        results.add(w.form + "\t" + w.neLabel + "\t" + w.neTypeLevel2);
+                    }
                     docpreds.add(conllline(w.neTypeLevel2, i, w.form));
                 }
                 docpreds.add("");
@@ -450,7 +434,9 @@ public class ACLRunner {
                             }
 
                             // word, gold, pred
-                            comparison.add(w.form + "\t" + w.neLabel + "\t" + predw.neLabel);
+                            if(!w.neLabel.equals(predw.neLabel)) {
+                                comparison.add(w.form + "\t" + w.neLabel + "\t" + predw.neLabel);
+                            }
 
 //                            // if they are not the same...
 //                            if(!predw.neLabel.equals(w.neLabel)){

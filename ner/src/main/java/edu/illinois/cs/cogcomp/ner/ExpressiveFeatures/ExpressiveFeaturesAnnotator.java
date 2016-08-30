@@ -131,20 +131,31 @@ public class ExpressiveFeaturesAnnotator {
 
         if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("Embedding")) {
             logger.debug("Setting embeddings features...");
+            int nullwords = 0;
+            int total = 0;
             for(int docid=0;docid<data.documents.size();docid++) {
                 ArrayList<LinkedVector> sentences = data.documents.get(docid).sentences;
                 for(int i=0;i<sentences.size();i++){
-                    logger.debug("On sentence: " + i);
+                    //logger.debug("On sentence: " + i);
                     LinkedVector vector=sentences.get(i);
                     for(int j=0;j<vector.size();j++) {
                         NEWord w = (NEWord) vector.get(j);
-                        if (train)
+                        if (train) {
                             w.wordvec = WordEmbedding.getWordVector(w.form, ParametersForLbjCode.currentParameters.trainlang);
-                        else
+                        }
+
+                        if (!train ){ //|| w.wordvec == null) {
                             w.wordvec = WordEmbedding.getWordVector(w.form, ParametersForLbjCode.currentParameters.testlang);
+                        }
+                        if (w.wordvec == null){
+                            //System.out.println(w.form);
+                            nullwords++;
+                        }
+                        total++;
                     }
                 }
             }
+            logger.debug("Null words percentage: " + ((nullwords) / (float)total));
             logger.debug("Done setting embeddings features.");
         }
 

@@ -174,14 +174,14 @@ public class SelfTrainer {
 
     public static void annotatefolder(String path, String outpath) throws Exception {
 
-        String config = "config/mono.config";
+        System.out.println(path);
+        String config = "config/uzug.config";
 
         Parameters.readConfigAndLoadExternalData(config, false);
 
         String modelPath = ParametersForLbjCode.currentParameters.pathToModelFile;
         NETaggerLevel1 tagger1 = new NETaggerLevel1(modelPath + ".level1", modelPath + ".level1.lex");
         NETaggerLevel2 tagger2 = new NETaggerLevel2(modelPath + ".level2", modelPath + ".level2.lex");
-
 
         String[] p = (new File(path)).list();
         for(String f : p){
@@ -205,8 +205,12 @@ public class SelfTrainer {
         //SelfTrainer.makeNewData("/shared/corpora/corporaWeb/lorelei/turkish/tools/ltf2txt/full_short/", "out-fs/");
         //SelfTrainer.annotatefolder("/shared/corpora/ner/eval/column/set0-mono-NW/","out-set0-NW/");
 
-        String dir = "/shared/corpora/ner/wikifier-features/ug/";
-        SelfTrainer.annotatefolder(dir + "iter10-NW-correct", dir + "iter10-NW-correct-koran/");
+        String dir = "/shared/corpora/ner/eval/column/";
+        //SelfTrainer.annotatefolder(dir + "setE-uly_", dir + "setE-uly_-anno2");
+        SelfTrainer.annotatefolder(dir + "mono-all-uly", dir + "mono-all-uly-anno2");
+
+        //String dir = "/shared/corpora/ner/lorelei/uz/";
+        //SelfTrainer.annotatefolder(dir + "mono", dir + "mono-anno/");
 
         //getFeatureWeights();
         
