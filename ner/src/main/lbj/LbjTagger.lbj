@@ -32,8 +32,8 @@ discrete% posTag(NEWord word) <-
 real% wikifierFeats(NEWord word) <-
     {
     if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("Wikifier")){
-
            if(word.wikifierfeats != null){
+               System.out.println("word.wikifierfeats!");
                for(int j = 0; j < word.wikifierfeats.length; j++){
                    String f = word.wikifierfeats[j];
                    String[] sf = f.split(":");

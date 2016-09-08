@@ -45,7 +45,7 @@ public class Parameters {
             "Affixes", "PreviousTag1", "PreviousTag2", "PreviousTagPatternLevel1",
             "PreviousTagPatternLevel2", "AggregateContext", "AggregateGazetteerMatches",
             "PrevTagsForContext", "PredictionsLevel1", "GazetteersFeatures", "WordEmbeddings",
-            "BrownClusterPaths", "Linkability", "Embedding", "DumbStems"};
+            "BrownClusterPaths", "Linkability", "Embedding", "DumbStems", "Wikifier"};
 
 
     /**
