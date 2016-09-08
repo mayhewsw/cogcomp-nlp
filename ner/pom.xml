@@ -28,7 +28,7 @@
         <dependency>
             <groupId>edu.illinois.cs.cogcomp</groupId>
             <artifactId>illinois-core-utilities</artifactId>
-            <version>3.0.56</version>
+            <version>3.0.71</version>
         </dependency>
         <!-- Contains the gazetteers and Brown clusters -->
         <dependency>
