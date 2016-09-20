@@ -10,6 +10,7 @@ DISTDIR="target"
 LIBDIR="target/dependency"
 MODELDIR="models/edu/illinois/cs/cogcomp/pos/lbjava"
 
+
 MAIN=
 
 CP=.
@@ -27,9 +28,14 @@ if [ ! -e $LIBDIR ]; then
     rm $LIBDIR/*model*jar
 fi
 
-for JAR in `ls $DISTDIR/*jar`; do
-    CP="$CP:$JAR"
-done
+
+
+CP="$CP:target/classes/"
+
+
+#for JAR in `ls $DISTDIR/*jar`; do
+#    CP="$CP:$JAR"
+#done
 
 for JAR in `ls $LIBDIR/*jar`; do
     CP="$CP:$JAR"
@@ -38,7 +44,7 @@ done
 
 MAIN=edu.illinois.cs.cogcomp.pos.POSTrain
 
-CMD="java -Xmx1g -cp $CP $MAIN"
+CMD="java -Xmx8g -cp $CP $MAIN"
 
 echo "$0: running command '$CMD'..."
 

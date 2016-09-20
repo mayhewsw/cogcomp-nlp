@@ -62,6 +62,7 @@ public class TestPOS {
 
         String testingFile = rm.getString("testData");
 
+        System.out.println("Testing on: " + testingFile);
 
 
         TestDiscrete.testDiscrete(new TestDiscrete(), new POSTagger(), new POSLabel(),

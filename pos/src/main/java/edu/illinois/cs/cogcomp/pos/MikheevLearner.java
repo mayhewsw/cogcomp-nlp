@@ -205,10 +205,10 @@ public class MikheevLearner extends POSBaselineLearner {
             }
 
             if (result.size() == 0)
-                result.add("NNP");
+                result.add("NP00000");
         } else if (word.form.contains("-")) {
-            result.add("NN");
-            result.add("JJ");
+            result.add("NP00000");
+            result.add("NP00000");
         } else {
             if (word.form.length() >= 6) {
                 String suffix = word.form.substring(word.form.length() - 4).toLowerCase();
@@ -223,7 +223,7 @@ public class MikheevLearner extends POSBaselineLearner {
             }
 
             if (result.size() == 0)
-                result.add("NN");
+                result.add("NP00000");
         }
 
         return result;

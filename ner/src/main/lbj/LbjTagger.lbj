@@ -24,7 +24,22 @@ discrete% posTag(NEWord word) <-
         for (i = 0; i <= 2 && last != null; ++i) last = (NEWord) last.next;
         for (i = 0; i > -2 && w.previous != null; --i) w = (NEWord) w.previous;
 
-        for (; w != last; w = (NEWord) w.next) sense "POS" + i++ : w.partOfSpeech;
+        for (; w != last; w = (NEWord) w.next){
+             sense "POS" + i : w.partOfSpeech;
+
+//             // just the first two characters.
+//             if(w.partOfSpeech.length() >= 2){
+//                sense "2POS" + i : w.partOfSpeech.charAt(0) + w.partOfSpeech.charAt(1);
+//             }
+//
+//             // this makes sense in the case of the PAROLE pos tags where each character has meaning.
+//             char[] chars = w.partOfSpeech.toCharArray();
+//             for(int j = 0; j < w.partOfSpeech.length(); j++){
+//                 //System.out.println("POS" + i + "CHAR" + j + ":" + chars[j]);
+//                 sense "POS" + i + "CHAR" + j : chars[j];
+//             }
+             i++;
+        }
 	}
 }
 
@@ -33,14 +48,15 @@ real% wikifierFeats(NEWord word) <-
     {
     if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("Wikifier")){
            if(word.wikifierfeats != null){
-               System.out.println("word.wikifierfeats!");
                for(int j = 0; j < word.wikifierfeats.length; j++){
                    String f = word.wikifierfeats[j];
                    String[] sf = f.split(":");
                    String name = "";
                    for(int i = 0; i < sf.length-1; i++)
                        name += sf[i]+":";
-                   sense "wiki:" + name : Double.parseDouble(sf[sf.length-1]);
+                   if(!sf[sf.length-1].equals("x")){
+                       sense "wiki:" + name : Double.parseDouble(sf[sf.length-1]);
+                   }
                }
            }
        }

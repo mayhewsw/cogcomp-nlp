@@ -165,9 +165,9 @@ public class POSBaselineLearner extends Learner {
 
         if (counts == null) {
             if (form.equals(";"))
-                l = ":";
+                l = "Fc";
             else if (looksLikeNumber(form))
-                l = "CD";
+                l = "Z";
             else
                 l = "UNKNOWN";
         } else {
@@ -261,9 +261,9 @@ public class POSBaselineLearner extends Learner {
         if (!table.containsKey(form)) {
             HashSet<String> result = new HashSet<>();
             if (form.equals(";"))
-                result.add(":");
+                result.add("Fd");
             else if (looksLikeNumber(form))
-                result.add("CD");
+                result.add("Z");
             return result;
         }
 

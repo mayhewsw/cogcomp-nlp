@@ -34,7 +34,7 @@ public class POSTrain {
     private ResourceManager rm;
 
     public POSTrain() {
-        this(50);
+        this(20);
     }
 
     public POSTrain(int iter) {
@@ -131,5 +131,6 @@ public class POSTrain {
         POSTrain trainer = new POSTrain();
         trainer.trainModels();
         trainer.writeModelsToDisk();
+
     }
 }

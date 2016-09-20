@@ -94,6 +94,7 @@ public class LORELEIRunner {
                 WordEmbedding.loadMultiDBNew(ParametersForLbjCode.currentParameters.testlang);
         }
 
+
         if(cmd.hasOption("train")){
             int trainiter = 30;
             String trainroot = cmd.getOptionValue("train");

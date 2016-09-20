@@ -22,19 +22,19 @@ import edu.illinois.cs.cogcomp.core.utilities.configuration.ResourceManager;
 public class POSConfigurator extends Configurator {
     /** A configurable prefix. */
     public static final Property CORPUS_PREFIX = new Property("corpusPrefix",
-            "/shared/corpora/corporaWeb/written/eng/POS/");
+            "/home/mayhew2/Downloads/spanish/");
     /** The file containing the training set. */
     public static final Property TRAINING_DATA = new Property("trainingData", CORPUS_PREFIX.value
-            + "00-18.br");
+            + "es.train.short");
     /** The file containing the development set. */
     public static final Property DEV_DATA = new Property("devData", CORPUS_PREFIX.value
-            + "19-21.br");
+            + "es.train.short");
     /** The file containing the test set. */
     public static final Property TEST_DATA = new Property("testData", CORPUS_PREFIX.value
-            + "22-24.br");
+            + "es.test.short");
     /** The file containing the training <i>and</i> development sets. */
     public static final Property TRAINING_AND_DEV_DATA = new Property("trainingAndDevData",
-            CORPUS_PREFIX.value + "00-21.br");
+            CORPUS_PREFIX.value + "es.train.short");
 
     public static final Property BASELINE_NAME = new Property("baselineName", "BaselineTarget");
     public static final Property MIKHEEV_NAME = new Property("mikheevName", "MikheevTable");

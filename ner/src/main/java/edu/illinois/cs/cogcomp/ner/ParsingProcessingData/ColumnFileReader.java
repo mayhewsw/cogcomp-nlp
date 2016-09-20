@@ -17,8 +17,11 @@ import edu.illinois.cs.cogcomp.ner.LbjTagger.NEWord;
 import edu.illinois.cs.cogcomp.lbjava.nlp.ColumnFormat;
 import edu.illinois.cs.cogcomp.lbjava.nlp.Word;
 import edu.illinois.cs.cogcomp.lbjava.parse.LinkedVector;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 class ColumnFileReader extends ColumnFormat {
@@ -42,7 +45,15 @@ class ColumnFileReader extends ColumnFormat {
 
         LinkedVector res = new LinkedVector();
         NEWord w = new NEWord(new Word(line[5], line[4]), null, line[0]);
-        NEWord.addTokenToSentence(res, w.form, w.neLabel);
+        if(line.length > 10) {
+            if(line[10].equals("x")){
+                System.out.println(filename + ": " + StringUtils.join(line, " "));
+            }
+            w.addWikifierFeatures(Arrays.copyOfRange(line, 10, line.length));
+        }
+
+
+        NEWord.addTokenToSentence(res, w);
 
         for (line = (String[]) super.next(); line != null && line.length > 0; line =
                 (String[]) super.next()) {
@@ -50,7 +61,13 @@ class ColumnFileReader extends ColumnFormat {
             //line[5] = LanguageSpecificNormalizer.removesuffixes(line[5]);
 
             w = new NEWord(new Word(line[5], line[4]), null, line[0]);
-            NEWord.addTokenToSentence(res, w.form, w.neLabel);
+            if(line.length > 10) {
+                if(line[10].equals("x")){
+                    System.out.println(filename + ": " + StringUtils.join(line, " "));
+                }
+                w.addWikifierFeatures(Arrays.copyOfRange(line, 10, line.length));
+            }
+            NEWord.addTokenToSentence(res, w);
         }
         if (res.size() == 0)
             return null;

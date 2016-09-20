@@ -165,4 +165,8 @@ public class CoNLLNerReader extends TextAnnotationReader {
         return textAnnotations.size() > taCounter;
     }
 
+    public int getNum(){
+        return textAnnotations.size();
+    }
+
 }

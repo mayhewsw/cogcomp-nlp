@@ -9,9 +9,6 @@ import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.PlainTextReader;
 import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.TaggedDataReader;
 import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.TaggedDataWriter;
 
-import edu.illinois.cs.cogcomp.lbjava.learn.Lexicon;
-import edu.illinois.cs.cogcomp.nlp.corpusreaders.CoNLLColumnFormatReader;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -177,7 +174,7 @@ public class SelfTrainer {
     public static void annotatefolder(String path, String outpath) throws Exception {
 
         System.out.println(path);
-        String config = "config/uzug.config";
+        String config = "config/tac.config";
 
         Parameters.readConfigAndLoadExternalData(config, false);
 
@@ -208,18 +205,8 @@ public class SelfTrainer {
         //SelfTrainer.makeNewData("/shared/corpora/corporaWeb/lorelei/turkish/tools/ltf2txt/full_short/", "out-fs/");
         //SelfTrainer.annotatefolder("/shared/corpora/ner/eval/column/set0-mono-NW/","out-set0-NW/");
 
-        String dir = "/shared/corpora/ner/eval/column/";
-        //SelfTrainer.annotatefolder(dir + "setE-uly_", dir + "setE-uly_-anno2");
-        SelfTrainer.annotatefolder(dir + "mono-all-uly", dir + "mono-all-uly-anno2");
-
-        //String dir = "/shared/corpora/ner/lorelei/uz/";
-        //SelfTrainer.annotatefolder(dir + "mono", dir + "mono-anno/");
-
-        //getFeatureWeights();
-        
-        //String datadir = "/shared/corpora/ner/parallel/tr/";
-
-        //reannotate(datadir + "Train-edit/", datadir + "GoldPred/");
+        String dir = "/shared/corpora/ner/wikifier-features/es/";
+        SelfTrainer.annotatefolder(dir + "eval2016", dir + "eval2016-tagged");
 
     }
 

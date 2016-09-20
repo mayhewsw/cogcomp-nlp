@@ -139,12 +139,12 @@ public class BrownClusters {
                 tokensHash.put(form, true);
                 tokensHashIC.put(form.toLowerCase(), true);
             }
-        /*
-         * System.out.println("Data statistics:");
-         * System.out.println("\t\t- Total tokens with repetitions ="+ totalTokens);
-         * System.out.println("\t\t- Total unique tokens  ="+ tokensHash.size());
-         * System.out.println("\t\t- Total unique tokens ignore case ="+ tokensHashIC.size());
-         */
+
+        System.out.println("Data statistics:");
+        //System.out.println("\t\t- Total tokens with repetitions ="+ totalTokens);
+        System.out.println("\t\t- Total unique tokens  ="+ tokensHash.size());
+        System.out.println("\t\t- Total unique tokens ignore case ="+ tokensHashIC.size());
+
         for (THashMap<String, String> wordToPath : wordToPathByResource) {
             HashMap<String, Boolean> oovCaseSensitiveHash = new HashMap<>();
             HashMap<String, Boolean> oovAfterLowercasingHash = new HashMap<>();
