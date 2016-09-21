@@ -11,6 +11,7 @@
 package edu.illinois.cs.cogcomp.ner.ParsingProcessingData;
 
 
+import edu.illinois.cs.cogcomp.core.utilities.StringUtils;
 import edu.illinois.cs.cogcomp.ner.LanguageSpecificNormalizer;
 import edu.illinois.cs.cogcomp.ner.LbjTagger.NERDocument;
 import edu.illinois.cs.cogcomp.ner.LbjTagger.NEWord;
@@ -19,6 +20,7 @@ import edu.illinois.cs.cogcomp.lbjava.nlp.Word;
 import edu.illinois.cs.cogcomp.lbjava.parse.LinkedVector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 class ColumnFileReader extends ColumnFormat {
@@ -37,20 +39,26 @@ class ColumnFileReader extends ColumnFormat {
         if (line == null)
             return null;
 
-        //line[5] = LanguageSpecificNormalizer.removesuffixes(line[5]);
-
-
         LinkedVector res = new LinkedVector();
         NEWord w = new NEWord(new Word(line[5], line[4]), null, line[0]);
-        NEWord.addTokenToSentence(res, w.form, w.neLabel);
+
+        if(line.length > 10) {
+            w.addWikifierFeatures(Arrays.copyOfRange(line, 10, line.length));
+        }
+
+
+        NEWord.addTokenToSentence(res, w);
 
         for (line = (String[]) super.next(); line != null && line.length > 0; line =
                 (String[]) super.next()) {
 
-            //line[5] = LanguageSpecificNormalizer.removesuffixes(line[5]);
-
             w = new NEWord(new Word(line[5], line[4]), null, line[0]);
-            NEWord.addTokenToSentence(res, w.form, w.neLabel);
+            if(line.length > 10) {
+                w.addWikifierFeatures(Arrays.copyOfRange(line, 10, line.length));
+            }
+
+
+            NEWord.addTokenToSentence(res, w);
         }
         if (res.size() == 0)
             return null;
