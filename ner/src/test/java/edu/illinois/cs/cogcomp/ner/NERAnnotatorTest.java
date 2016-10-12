@@ -11,10 +11,7 @@
 package edu.illinois.cs.cogcomp.ner;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Properties;
+import java.util.*;
 
 import edu.illinois.cs.cogcomp.core.utilities.configuration.Property;
 import edu.illinois.cs.cogcomp.ner.LbjTagger.RandomLabelGenerator;
@@ -30,7 +27,6 @@ import edu.illinois.cs.cogcomp.core.datastructures.textannotation.TextAnnotation
 import edu.illinois.cs.cogcomp.core.datastructures.textannotation.View;
 import edu.illinois.cs.cogcomp.core.utilities.configuration.ResourceManager;
 import edu.illinois.cs.cogcomp.nlp.tokenizer.IllinoisTokenizer;
-import weka.core.Debug.Random;
 
 import static org.junit.Assert.*;
 

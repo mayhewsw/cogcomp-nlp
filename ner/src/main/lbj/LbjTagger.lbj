@@ -18,7 +18,6 @@ import edu.illinois.cs.cogcomp.ner.WordEmbedding;
 discrete% posTag(NEWord word) <-
 {
 	if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("POSTags")){
-		//System.out.println(word + ": " + word.partOfSpeech);
  		int i;
         NEWord w = word, last = word;
         for (i = 0; i <= 2 && last != null; ++i) last = (NEWord) last.next;
@@ -33,7 +32,6 @@ real% wikifierFeats(NEWord word) <-
     {
     if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("Wikifier")){
            if(word.wikifierfeats != null){
-               //System.out.println("word.wikifierfeats!");
                for(int j = 0; j < word.wikifierfeats.length; j++){
                    String f = word.wikifierfeats[j];
                    String[] sf = f.split(":");

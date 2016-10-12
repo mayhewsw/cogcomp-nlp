@@ -43,6 +43,7 @@ public class LORELEIRunner {
     public static String config = null;
 
     public static void main(String[] args) throws Exception {
+
         Options options = new Options();
         Option help = new Option( "help", "print this message" );
 

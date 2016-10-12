@@ -4,25 +4,31 @@
 # Classpath
 cpath="target/classes:target/dependency/*:config"
 
-LANG="ta"
+LANG="bn"
 
 #TRAIN=/shared/corpora/ner/translate/eng/Train-ta3/
-TRAIN=/shared/corpora/ner/translate/eng/Train-ta/
-#TRAIN=/shared/corpora/ner/conll2003/eng/Train-ta/
+#TRAIN=/shared/corpora/ner/translate/$LANG/Train/
+TRAIN=/shared/corpora/ner/translate/$LANG/Train-translit/
+#TRAIN=/shared/corpora/ner/conll2003/eng/Train/
 #TRAIN=/shared/corpora/ner/conll2002/es/Train/
 #TRAIN=/shared/corpora/ner/lorelei/$LANG/Train/
 #TRAIN=/shared/corpora/ner/eval/column/trainset3000/
 #TRAIN=/shared/corpora/ner/lorelei/$LANG/All-out/
 #TRAIN=/shared/corpora/ner/lorelei/$LANG/All-lm2/
 #TRAIN=/shared/corpora/ner/eval/column/dev2/
-#TRAIN=/shared/corpora/ner/parallel/$LANG/Train-fa/
+#TRAIN=/shared/corpora/ner/parallel/$LANG/Train-edit/
 
 CONFIG=config/trans.config
+#CONFIG=config/mono.config
+#CONFIG=config/hash.config
 
-#TEST=/shared/corpora/ner/conll2003/deu/Test/
+
+#TEST=/shared/corpora/ner/conll2003/eng/Test/
+#TEST=/home/mayhew2/IdeaProjects/illinois-cogcomp-nlp/ner/HashTest/
 #TEST=/shared/corpora/ner/conll2002/nl/Test/
 #TEST=/shared/corpora/ner/conll2002/es/Test/
 #TEST=/shared/corpora/ner/lorelei/$LANG/Test/
+#TEST=/shared/corpora/ner/wikifier-features/$LANG/test-camera3
 TEST=/shared/corpora/ner/wikifier-features/$LANG/test-camera3
 #TEST=/shared/corpora/ner/lorelei/tr/Test-urom/
 
