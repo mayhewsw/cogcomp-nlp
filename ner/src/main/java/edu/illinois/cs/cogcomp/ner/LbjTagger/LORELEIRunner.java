@@ -194,6 +194,7 @@ public class LORELEIRunner {
             IOUtils.mkdir( modelPath );
         }
 
+
         IOUtils.cp(config, modelPath + "/" + FilenameUtils.getName(config));
 
         NETaggerLevel1 tagger1 = new NETaggerLevel1(modelPath + ".level1", modelPath + ".level1.lex");
@@ -246,6 +247,8 @@ public class LORELEIRunner {
                 for (int i = 0; i < sentences.get(k).size() ; ++i){
                     NEWord w = (NEWord)sentences.get(k).get(i);
                     if(!w.neLabel.equals(w.neTypeLevel2)) {
+                        results.add("***" + w.form + "\t" + w.neLabel + "\t" + w.neTypeLevel2);
+                    }else{
                         results.add(w.form + "\t" + w.neLabel + "\t" + w.neTypeLevel2);
                     }
                     docpreds.add(ACLRunner.conllline(w.neTypeLevel2, i, w.form));

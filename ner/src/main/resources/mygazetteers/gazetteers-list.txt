@@ -132,3 +132,8 @@ gazetteers/Weapons.Torpedoes.gz
 /shared/corpora/ner/gazetteers/yo/org
 /shared/corpora/ner/gazetteers/yo/per
 /shared/corpora/ner/gazetteers/yo/song
+/shared/corpora/ner/gazetteers/th/film
+/shared/corpora/ner/gazetteers/th/loc
+/shared/corpora/ner/gazetteers/th/org
+/shared/corpora/ner/gazetteers/th/per
+/shared/corpora/ner/gazetteers/th/song

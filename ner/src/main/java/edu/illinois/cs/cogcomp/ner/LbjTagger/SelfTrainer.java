@@ -20,7 +20,7 @@ import java.util.*;
 @SuppressWarnings("Duplicates")
 public class SelfTrainer {
 
-    public static final String config = "/home/mayhew2/IdeaProjects/transliteration-ner/config/eval.config";
+    public static final String config = "/home/mayhew2/IdeaProjects/illinois-cogcomp-nlp/ner/config/mono.config";
 
     /**
      * Given a datapath, load the model and annotate the data, and write it out to outpath.
@@ -72,7 +72,7 @@ public class SelfTrainer {
                 List<String> sentlines = new ArrayList<>();
 
                 ArrayList<Integer> indicesToInclude = new ArrayList<>();
-                int window = 5;
+                int window = 5000;
 
                 for (int i = 0; i < sentence.size() ; ++i){
                     NEWord w = (NEWord)sentence.get(i);
@@ -153,8 +153,6 @@ public class SelfTrainer {
                     }                    
                 }
             }
-
-
         }
         
         // then write out to another file?
@@ -174,7 +172,7 @@ public class SelfTrainer {
     public static void annotatefolder(String path, String outpath) throws Exception {
 
         System.out.println(path);
-        String config = "config/uzug.config";
+        String config = "config/tacl/ta.config";
 
         Parameters.readConfigAndLoadExternalData(config, false);
 
@@ -205,12 +203,14 @@ public class SelfTrainer {
         //SelfTrainer.makeNewData("/shared/corpora/corporaWeb/lorelei/turkish/tools/ltf2txt/full_short/", "out-fs/");
         //SelfTrainer.annotatefolder("/shared/corpora/ner/eval/column/set0-mono-NW/","out-set0-NW/");
 
-        String dir = "/shared/corpora/ner/eval/column/";
+//        String dir = "/shared/corpora/ner/eval/column/";
         //SelfTrainer.annotatefolder(dir + "setE-uly_", dir + "setE-uly_-anno2");
-        SelfTrainer.annotatefolder(dir + "mono-all-uly", dir + "mono-all-uly-anno2");
+//        String infolder = "/shared/corpora/corporaWeb/lorelei/evaluation-20160705/LDC2016E57_LORELEI_IL3_Incident_Language_Pack_for_Year_1_Eval/set0/tools/ltf2txt/eng-rsd/";
+//        SelfTrainer.makeNewData(infolder, "outfolder/");
 
-        //String dir = "/shared/corpora/ner/lorelei/uz/";
-        //SelfTrainer.annotatefolder(dir + "mono", dir + "mono-anno/");
+        //String dir = "/shared/corpora/ner/hengji/ta/10k/";
+        //String dir = "/shared/corpora/ner/hengji/ta/Test";
+        SelfTrainer.annotatefolder("/tmp/tt1", "/tmp/tt1-anno");
 
         //getFeatureWeights();
         

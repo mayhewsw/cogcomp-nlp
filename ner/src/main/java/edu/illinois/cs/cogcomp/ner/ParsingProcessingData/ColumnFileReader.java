@@ -51,12 +51,10 @@ class ColumnFileReader extends ColumnFormat {
 
         for (line = (String[]) super.next(); line != null && line.length > 0; line =
                 (String[]) super.next()) {
-
             w = new NEWord(new Word(line[5], line[4]), null, line[0]);
             if(line.length > 10) {
                 w.addWikifierFeatures(Arrays.copyOfRange(line, 10, line.length));
             }
-
 
             NEWord.addTokenToSentence(res, w);
         }

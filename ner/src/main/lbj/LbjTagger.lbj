@@ -442,7 +442,7 @@ discrete% BrownClusterPaths(NEWord word) <-
 // Problem 1
 discrete% FormParts(NEWord word) <-
 {
-  	if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("Forms")&&
+  	if(false && ParametersForLbjCode.currentParameters.featuresToUse.containsKey("Forms")&&
   		ParametersForLbjCode.currentParameters.tokenizationScheme.equals(ParametersForLbjCode.TokenizationScheme.DualTokenizationScheme))
 	{ 
 		sense "0" : word.form;
@@ -538,9 +538,9 @@ discrete% Affixes(NEWord word) <-
                 j++;
 	    }
 
-        if(ParametersForLbjCode.currentParameters.tokenizationScheme.equals(ParametersForLbjCode.TokenizationScheme.DualTokenizationScheme))
-            for(int i=0;i<word.parts.length;i++)
-                sense "part"+i : word.parts[i];
+//        if(ParametersForLbjCode.currentParameters.tokenizationScheme.equals(ParametersForLbjCode.TokenizationScheme.DualTokenizationScheme))
+//            for(int i=0;i<word.parts.length;i++)
+//                sense "part"+i : word.parts[i];
 	}
 }
 

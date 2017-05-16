@@ -62,16 +62,18 @@ public class ACLRunner {
     public static final String config = "config/mono.config";
 
     public static void main(String[] args) throws Exception {
-
-        String lang = "tr";
-        String predpath = "conllout/"; //"/shared/corpora/ner/parallel/"+lang+"/GoldPred/";
-        String goldpath = "/shared/corpora/ner/lorelei/"+lang+"/All/";
+        System.out.println("NOW USING COMPAREWITHGOLD ONLY");
+        //String lang = "tr";
+        //String predpath = "conllout/"; //"/shared/corpora/ner/parallel/"+lang+"/GoldPred/";
+        //String goldpath = "/shared/corpora/ner/lorelei/"+lang+"/All/";
 
         //CompareWithGold(predpath, goldpath, lang);
 
-        singlelang(args[0], args[1], args[2]);
-
+        //singlelang(args[0], args[1], args[2]);
         //multisource(args[0], args[1], args[2]);
+
+        // predpath, goldpath, lang
+        CompareWithGold(args[0], args[1], args[2]);
     }
 
     public static void multisource(String train1, String train2, String test) throws Exception{

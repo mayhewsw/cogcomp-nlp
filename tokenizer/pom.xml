@@ -29,6 +29,11 @@
             <version>3.0.50-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>edu.illinois.cs.cogcomp</groupId>
+            <artifactId>LBJava</artifactId>
+            <version>RELEASE</version>
+        </dependency>
 
     </dependencies>
 </project>
