@@ -22,10 +22,12 @@ cpath="target/classes:target/dependency/*:config"
 #TEST=/shared/corpora/ner/eval/column/dev2/
 #TEST=/shared/corpora/ner/wikifier-features/zh/Test-go-4types/
 
-LANG=ta
-PRED=/shared/corpora/ner/hengji/ta/Test-myanno
+LANG=am
+PRED=/shared/corpora/corporaWeb/lorelei/data/LDC2016E86_LORELEI_Amharic_Representative_Language_Pack_Monolingual_Text_V1.1/data/monolingual_text/zipped/dryrun-outputs/combined/column/
+
+#/tmp/all-anno-comb/
 #PRED=/tmp/tt
-GOLD=/shared/corpora/ner/hengji/ta/Test
+GOLD=/shared/corpora/ner/lorelei/am/All-nosn-stem/
 
 
 CMD="java -classpath  ${cpath} -Xmx8g edu.illinois.cs.cogcomp.ner.LbjTagger.ACLRunner $PRED $GOLD $LANG"

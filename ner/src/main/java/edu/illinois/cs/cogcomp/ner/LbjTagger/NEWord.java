@@ -138,6 +138,15 @@ public class NEWord extends Word
 		neTypeLevel1=null;
 	}
 
+	public NEWord(Word w, NEWord p, String type, int start, int end)
+	{
+		super(w.form, w.partOfSpeech, w.lemma, w.wordSense, p, start, end);
+		form=w.form;
+		originalForm=w.form;
+		neLabel = type;
+		neTypeLevel1=null;
+	}
+
 
 	/**
 	 * Produces a simple <code>String</code> representation of this word in

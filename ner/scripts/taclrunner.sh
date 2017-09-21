@@ -14,7 +14,7 @@ OUTF=logs/$LANG-`date +%m-%d-%y-%H%M`.log
 
 echo "Logging to:" $OUTF
 
-TRAIN=/shared/corpora/ner/translate/$LANG/Train-translit
+TRAIN=/shared/corpora/ner/translate/$LANG/Train
 #TRAIN=/shared/corpora/ner/conll2003/eng/Train-nomisc-$LANG/
 
 if [ ! -d "$TRAIN" ]; then

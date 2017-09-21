@@ -169,10 +169,9 @@ public class SelfTrainer {
 
     }
 
-    public static void annotatefolder(String path, String outpath) throws Exception {
+    public static void annotatefolder(String config, String path, String outpath) throws Exception {
 
         System.out.println(path);
-        String config = "config/tacl/ta.config";
 
         Parameters.readConfigAndLoadExternalData(config, false);
 
@@ -180,8 +179,10 @@ public class SelfTrainer {
         NETaggerLevel1 tagger1 = new NETaggerLevel1(modelPath + ".level1", modelPath + ".level1.lex");
         NETaggerLevel2 tagger2 = new NETaggerLevel2(modelPath + ".level2", modelPath + ".level2.lex");
 
-
         String[] p = (new File(path)).list();
+        System.out.println(new File(path));
+        System.out.println(path);
+        System.out.println(p);
         for(String f : p){
             Data data = new Data();
             NERDocument doc = TaggedDataReader.readFile(path + "/" + f, "-c", f);
@@ -210,7 +211,13 @@ public class SelfTrainer {
 
         //String dir = "/shared/corpora/ner/hengji/ta/10k/";
         //String dir = "/shared/corpora/ner/hengji/ta/Test";
-        SelfTrainer.annotatefolder("/tmp/tt1", "/tmp/tt1-anno");
+        String config = args[0];
+        String indir = args[1];
+        String outdir = args[2];
+
+        SelfTrainer.annotatefolder(config, indir, outdir);
+
+        //SelfTrainer.annotatefolder(config, "/shared/corpora/ner/eval/column/final-mayhew2-stem-orig", "/shared/corpora/ner/eval/column/final-mayhew2-annobybest/");
 
         //getFeatureWeights();
         

@@ -40,18 +40,26 @@ class ColumnFileReader extends ColumnFormat {
             return null;
 
         LinkedVector res = new LinkedVector();
-        NEWord w = new NEWord(new Word(line[5], line[4]), null, line[0]);
+        NEWord w;
+        try {
+            w = new NEWord(new Word(line[5], line[4], Integer.parseInt(line[2]), Integer.parseInt(line[3])), null, line[0]);
+        }catch(NumberFormatException e ){
+            w = new NEWord(new Word(line[5], line[4]), null, line[0]);
+        }
 
         if(line.length > 10) {
             w.addWikifierFeatures(Arrays.copyOfRange(line, 10, line.length));
         }
 
-
         NEWord.addTokenToSentence(res, w);
 
         for (line = (String[]) super.next(); line != null && line.length > 0; line =
                 (String[]) super.next()) {
-            w = new NEWord(new Word(line[5], line[4]), null, line[0]);
+            try {
+                w = new NEWord(new Word(line[5], line[4], Integer.parseInt(line[2]), Integer.parseInt(line[3])), null, line[0]);
+            }catch(NumberFormatException e ){
+                w = new NEWord(new Word(line[5], line[4]), null, line[0]);
+            }
             if(line.length > 10) {
                 w.addWikifierFeatures(Arrays.copyOfRange(line, 10, line.length));
             }

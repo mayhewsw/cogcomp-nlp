@@ -121,8 +121,8 @@ public class TaggedDataWriter {
                     res.append("O	0	0	O	-X-	-DOCSTART-	x	x	0\n\n");
                 for (int j = 0; j < vector.size(); j++) {
                     NEWord w = (NEWord) vector.get(j);
-                    res.append(w.getPrediction(labelType)).append("\t0\t").append(j)
-                            .append("\tO\tO\t").append(w.form).append("\tx\tx\t0\n");
+                    res.append(w.getPrediction(labelType)).append("\t").append(j).append("\t" + w.start + "\t").append(w.end + "\t")
+                            .append("O\t").append(w.form).append("\tx\tx\t0\n");
                 }
                 res.append("\n");
             }
