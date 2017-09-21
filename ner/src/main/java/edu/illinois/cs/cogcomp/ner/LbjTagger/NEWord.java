@@ -32,7 +32,10 @@ public class NEWord extends Word
 	public NamedEntity goldEntity=null;//if non-null it keeps the named entity the tagger annotated this word with
 	/** This field stores the named entity type tag found in labeled data. */
 	public String neLabel=null;
-	
+
+
+	public double weight = 1.0;
+
 
 	public String originalSpelling="";
 	public String[] parts;
@@ -147,6 +150,13 @@ public class NEWord extends Word
 		neTypeLevel1=null;
 	}
 
+	public double getWeight(){
+		return this.weight;
+	}
+
+	public void setWeight(double w){
+		this.weight = w;
+	}
 
 	/**
 	 * Produces a simple <code>String</code> representation of this word in
