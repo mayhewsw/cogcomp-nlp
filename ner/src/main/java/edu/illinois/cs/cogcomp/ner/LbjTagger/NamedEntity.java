@@ -68,6 +68,7 @@ public class NamedEntity {
                 }
             i++;
         }
+
         form = "";
         for (i = 0; i < tokens.size() - 1; i++)
             form += tokens.elementAt(i).form + " ";

@@ -10,10 +10,11 @@ import edu.illinois.cs.cogcomp.lbjava.nlp.Word;
 import edu.illinois.cs.cogcomp.lbjava.nlp.WordSplitter;
 import edu.illinois.cs.cogcomp.lbjava.parse.LinkedVector;
 import edu.illinois.cs.cogcomp.lbjava.parse.Parser;
+import edu.illinois.cs.cogcomp.lbjava.util.WeightedObject;
 import edu.illinois.cs.cogcomp.ner.StringStatisticsUtils.CharacteristicWords;
 
 
-public class NEWord extends Word
+public class NEWord extends Word implements WeightedObject
 {
 
 	public String[] wikifierfeats;

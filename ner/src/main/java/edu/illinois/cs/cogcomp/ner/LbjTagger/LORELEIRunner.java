@@ -115,7 +115,6 @@ public class LORELEIRunner {
             System.out.println("Tested on: " + testroot);
         }
 
-
     }
 
     /**
@@ -155,18 +154,13 @@ public class LORELEIRunner {
         TextChunkRepresentationManager.changeChunkRepresentation(
                 TextChunkRepresentationManager.EncodingScheme.BIO,
                 ParametersForLbjCode.currentParameters.taggingEncodingScheme,
-                dataSet, NEWord.LabelToLookAt.GoldLabel);
-
+                dataSet,
+                NEWord.LabelToLookAt.GoldLabel);
 
         // FIXME: this is where we set the progressOutput var for the BatchTrainer
         WeightedBatchTrainer bt = new WeightedBatchTrainer(classifier, new DataSetReader(dataSet), 50000);
 
         classifier.setLexicon(bt.preExtract(exampleStorePath));
-
-        TextChunkRepresentationManager.changeChunkRepresentation(
-                ParametersForLbjCode.currentParameters.taggingEncodingScheme,
-                TextChunkRepresentationManager.EncodingScheme.BIO,
-                dataSet, NEWord.LabelToLookAt.GoldLabel);
 
         return bt;
     }
@@ -189,8 +183,13 @@ public class LORELEIRunner {
                 logger.error( msg );
                 throw new IOException( msg );
             }
-            else
-                logger.warn( "writing to existing model path '" + modelPath + "'..." );
+            else {
+                logger.warn("deleting existing model path '" + modelPath + "'...");
+                IOUtils.rmDir(modelPath);
+                IOUtils.rm(modelPath + ".level1");
+                IOUtils.rm(modelPath + ".level1.lex");
+                IOUtils.rm(modelPath + ".level2");
+            }
         }
         else
         {
@@ -202,6 +201,7 @@ public class LORELEIRunner {
 
         NETaggerLevel1 tagger1 = new NETaggerLevel1(modelPath + ".level1", modelPath + ".level1.lex");
         tagger1.forget();
+        //NETaggerLevel1 tagger1 = new NETaggerLevel1();
 
         if (ParametersForLbjCode.currentParameters.featuresToUse.containsKey("PredictionsLevel1")) {
             PredictionsAndEntitiesConfidenceScores.getAndMarkEntities(trainData, NEWord.LabelToLookAt.GoldLabel);
@@ -338,7 +338,7 @@ public class LORELEIRunner {
             NEWord res =  (NEWord) dataset.documents.get(docid).sentences.get(sentenceId).get(tokenId);
 
             if (res.neLabel.equals("O")){
-                res.setWeight(0.001);
+                res.setWeight(0.005);
             }
 
             if(tokenId < dataset.documents.get(docid).sentences.get(sentenceId).size()-1)
