@@ -47,6 +47,10 @@ class ColumnFileReader extends ColumnFormat {
             w = new NEWord(new Word(line[5], line[4]), null, line[0]);
         }
 
+        if(!line[6].equals("x")){
+            w.setWeight(Double.parseDouble(line[6]));
+        }
+
         if(line.length > 10) {
             w.addWikifierFeatures(Arrays.copyOfRange(line, 10, line.length));
         }
@@ -60,6 +64,11 @@ class ColumnFileReader extends ColumnFormat {
             }catch(NumberFormatException e ){
                 w = new NEWord(new Word(line[5], line[4]), null, line[0]);
             }
+
+            if(!line[6].equals("x")){
+                w.setWeight(Double.parseDouble(line[6]));
+            }
+
             if(line.length > 10) {
                 w.addWikifierFeatures(Arrays.copyOfRange(line, 10, line.length));
             }

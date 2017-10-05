@@ -337,10 +337,6 @@ public class LORELEIRunner {
 
             NEWord res =  (NEWord) dataset.documents.get(docid).sentences.get(sentenceId).get(tokenId);
 
-            if (res.neLabel.equals("O")){
-                res.setWeight(0.005);
-            }
-
             if(tokenId < dataset.documents.get(docid).sentences.get(sentenceId).size()-1)
                 tokenId++;
             else {
