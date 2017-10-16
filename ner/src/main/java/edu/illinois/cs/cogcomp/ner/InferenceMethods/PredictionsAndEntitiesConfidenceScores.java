@@ -82,7 +82,11 @@ public class PredictionsAndEntitiesConfidenceScores {
      */
     public static Vector<NamedEntity> getAndMarkEntities(Data data,
             NEWord.LabelToLookAt predictionType) {
+
+        // Will return this.
         Vector<NamedEntity> res = new Vector<>();
+
+        // SWM: set predictedEntity and goldEntity to null for every word. (Why?)
         for (int docid = 0; docid < data.documents.size(); docid++) {
             ArrayList<LinkedVector> sentences = data.documents.get(docid).sentences;
             for (int i = 0; i < sentences.size(); i++)
@@ -92,21 +96,29 @@ public class PredictionsAndEntitiesConfidenceScores {
                     w.goldEntity = null;
                 }
         }
+
+
         int startSentence = -1;
         int startToken = -1;
         int startAbsIndex = -1;
         int absTokenId = 0;
         String type = "O";
+
+        // loops over every word.
         for (int docid = 0; docid < data.documents.size(); docid++) {
             ArrayList<LinkedVector> sentences = data.documents.get(docid).sentences;
+            // i in the sentence index
             for (int i = 0; i < sentences.size(); i++)
+                // j is the token index in the sentence.
                 for (int j = 0; j < sentences.get(i).size(); j++) {
                     NEWord w = (NEWord) sentences.get(i).get(j);
                     String label = w.neLabel;
+
                     if (predictionType.equals(NEWord.LabelToLookAt.PredictionLevel1Tagger))
                         label = w.neTypeLevel1;
                     if (predictionType.equals(NEWord.LabelToLookAt.PredictionLevel2Tagger))
                         label = w.neTypeLevel2;
+
                     String nextLabel = "O";
                     if (w.nextIgnoreSentenceBoundary != null) {
                         if (predictionType.equals(NEWord.LabelToLookAt.GoldLabel))
@@ -116,16 +128,17 @@ public class PredictionsAndEntitiesConfidenceScores {
                         if (predictionType.equals(NEWord.LabelToLookAt.PredictionLevel2Tagger))
                             nextLabel = w.nextIgnoreSentenceBoundary.neTypeLevel2;
                     }
+
                     if (startSentence == -1 && label.startsWith("B-")) {
                         startSentence = i;
                         startToken = j;
                         startAbsIndex = absTokenId;
                         type = label.substring(2);
                     }
+
+                    // this means we have found the full extent of the entity
                     if (startSentence != -1 && (!nextLabel.startsWith("I-"))) {
-                        NamedEntity e =
-                                new NamedEntity(sentences, startAbsIndex, startSentence,
-                                        startToken, i, j);
+                        NamedEntity e = new NamedEntity(sentences, startAbsIndex, startSentence, startToken, i, j);
                         e.type = type;
                         res.addElement(e);
                         if (predictionType.equals(NEWord.LabelToLookAt.GoldLabel))
@@ -136,10 +149,14 @@ public class PredictionsAndEntitiesConfidenceScores {
                                         .equals(NEWord.LabelToLookAt.PredictionLevel2Tagger))
                             for (int k = 0; k < e.tokens.size(); k++)
                                 e.tokens.elementAt(k).predictedEntity = e;
+
+                        // reset values.
                         startSentence = startToken = -1;
                     }
                     absTokenId++;
                 }
+            // don't allow entities over doc boundaries. (How did that happen in the first place...)
+            startSentence = startToken = -1;
         }
         return res;
     }

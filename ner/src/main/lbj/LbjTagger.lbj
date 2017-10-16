@@ -300,8 +300,8 @@ discrete% GazetteersFeatures(NEWord word) <-
  		int i=0;
    		NEWord w = word, last = (NEWord)word.next;
   
-   		for (i = 0; i < 2 && last != null; ++i) last = (NEWord) last.next;
-   		for (i = 0; i > -2 && w.previous != null; --i) w = (NEWord) w.previous;
+   		for (i = 0; i < 3 && last != null; ++i) last = (NEWord) last.next;
+   		for (i = 0; i > -3 && w.previous != null; --i) w = (NEWord) w.previous;
   
  		do 
    		{
@@ -358,8 +358,8 @@ discrete% Forms(NEWord word) <-
 	{ 
   		int i;
   		NEWord w = word, last = word;
-  		for (i = 0; i <= 2 && last != null; ++i) last = (NEWord) last.next;
-  		for (i = 0; i > -2 && w.previous != null; --i) w = (NEWord) w.previous;
+  		for (i = 0; i <= 3 && last != null; ++i) last = (NEWord) last.next;
+  		for (i = 0; i > -3 && w.previous != null; --i) w = (NEWord) w.previous;
 
 		int startIndex=i;
 		NEWord startWord=w;
@@ -427,8 +427,8 @@ discrete% BrownClusterPaths(NEWord word) <-
 		BrownClusters bc = BrownClusters.get();
   		int i;
   		NEWord w = word, last = word;
-  		for (i = 0; i <= 2 && last != null; ++i) last = (NEWord) last.next;
-  		for (i = 0; i > -2 && w.previous != null; --i) w = (NEWord) w.previous;
+  		for (i = 0; i <= 1 && last != null; ++i) last = (NEWord) last.next;
+  		for (i = 0; i > -1 && w.previous != null; --i) w = (NEWord) w.previous;
 
   		for (; w != last; w = (NEWord) w.next){
   			String[] paths=bc.getPrefixes(w);
@@ -697,7 +697,7 @@ mixed% FeaturesLevel1Only(NEWord word) <- PreviousTagPatternLevel1, PreviousTag1
 discrete NETaggerLevel1(NEWord word)  <-
 learn NELabel
   using FeaturesLevel1SharedWithLevel2,FeaturesLevel1Only
-  with new SparseNetworkLearner(new SparseAveragedPerceptron(.1, 0, 20))
+  with new SparseNetworkLearner(new WeightedSparseAveragedPerceptron(0.1, 0, 10))
   progressOutput 10000
 end
 
@@ -851,6 +851,6 @@ mixed% FeaturesLevel2(NEWord word) <-   PreviousTagPatternLevel2, Level1Aggregat
 discrete NETaggerLevel2(NEWord word)  <-
 learn NELabel 
   using FeaturesLevel1SharedWithLevel2,FeaturesLevel2
-  with new SparseNetworkLearner(new SparseAveragedPerceptron(.1, 0, 20))
+  with new SparseNetworkLearner(new WeightedSparseAveragedPerceptron(.1, 0, 20))
 end
 

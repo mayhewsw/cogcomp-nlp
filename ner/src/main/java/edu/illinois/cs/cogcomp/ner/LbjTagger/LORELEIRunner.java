@@ -7,8 +7,11 @@ import edu.illinois.cs.cogcomp.core.utilities.StringUtils;
 import edu.illinois.cs.cogcomp.lbjava.classify.TestDiscrete;
 import edu.illinois.cs.cogcomp.lbjava.learn.BatchTrainer;
 import edu.illinois.cs.cogcomp.lbjava.learn.SparseNetworkLearner;
+import edu.illinois.cs.cogcomp.lbjava.learn.WeightedBatchTrainer;
+import edu.illinois.cs.cogcomp.lbjava.parse.LinkedChild;
 import edu.illinois.cs.cogcomp.lbjava.parse.LinkedVector;
 import edu.illinois.cs.cogcomp.lbjava.parse.Parser;
+import edu.illinois.cs.cogcomp.lbjava.parse.WeightedParser;
 import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.ExpressiveFeaturesAnnotator;
 import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.TwoLayerPredictionAggregationFeatures;
 import edu.illinois.cs.cogcomp.ner.InferenceMethods.Decoder;
@@ -112,7 +115,6 @@ public class LORELEIRunner {
             System.out.println("Tested on: " + testroot);
         }
 
-
     }
 
     /**
@@ -146,24 +148,19 @@ public class LORELEIRunner {
      * @param exampleStorePath
      * @return
      */
-    private static BatchTrainer prefetchAndGetBatchTrainer(SparseNetworkLearner classifier, Data dataSet, String exampleStorePath) {
+    private static WeightedBatchTrainer prefetchAndGetBatchTrainer(SparseNetworkLearner classifier, Data dataSet, String exampleStorePath) {
         //logger.info("Pre-extracting the training data for Level 1 classifier");
 
         TextChunkRepresentationManager.changeChunkRepresentation(
                 TextChunkRepresentationManager.EncodingScheme.BIO,
                 ParametersForLbjCode.currentParameters.taggingEncodingScheme,
-                dataSet, NEWord.LabelToLookAt.GoldLabel);
-
+                dataSet,
+                NEWord.LabelToLookAt.GoldLabel);
 
         // FIXME: this is where we set the progressOutput var for the BatchTrainer
-        BatchTrainer bt = new BatchTrainer(classifier, new DataSetReader(dataSet), 50000);
+        WeightedBatchTrainer bt = new WeightedBatchTrainer(classifier, new DataSetReader(dataSet), 50000);
 
         classifier.setLexicon(bt.preExtract(exampleStorePath));
-
-        TextChunkRepresentationManager.changeChunkRepresentation(
-                ParametersForLbjCode.currentParameters.taggingEncodingScheme,
-                TextChunkRepresentationManager.EncodingScheme.BIO,
-                dataSet, NEWord.LabelToLookAt.GoldLabel);
 
         return bt;
     }
@@ -186,8 +183,13 @@ public class LORELEIRunner {
                 logger.error( msg );
                 throw new IOException( msg );
             }
-            else
-                logger.warn( "writing to existing model path '" + modelPath + "'..." );
+            else {
+                logger.warn("deleting existing model path '" + modelPath + "'...");
+                IOUtils.rmDir(modelPath);
+                IOUtils.rm(modelPath + ".level1");
+                IOUtils.rm(modelPath + ".level1.lex");
+                IOUtils.rm(modelPath + ".level2");
+            }
         }
         else
         {
@@ -199,6 +201,7 @@ public class LORELEIRunner {
 
         NETaggerLevel1 tagger1 = new NETaggerLevel1(modelPath + ".level1", modelPath + ".level1.lex");
         tagger1.forget();
+        //NETaggerLevel1 tagger1 = new NETaggerLevel1();
 
         if (ParametersForLbjCode.currentParameters.featuresToUse.containsKey("PredictionsLevel1")) {
             PredictionsAndEntitiesConfidenceScores.getAndMarkEntities(trainData, NEWord.LabelToLookAt.GoldLabel);
@@ -207,7 +210,7 @@ public class LORELEIRunner {
 
         logger.info("Pre-extracting the training data for Level 1 classifier");
         String arg = modelPath + ".level1.prefetchedTrainData";
-        BatchTrainer bt1train = prefetchAndGetBatchTrainer(tagger1, trainData, arg);
+        WeightedBatchTrainer bt1train = prefetchAndGetBatchTrainer(tagger1, trainData, arg);
 
         logger.info("Training...");
         bt1train.train(fixedNumIterations);
@@ -219,7 +222,7 @@ public class LORELEIRunner {
         if (ParametersForLbjCode.currentParameters.featuresToUse.containsKey("PredictionsLevel1")) {
 
             logger.info("Pre-extracting the training data for Level 2 classifier");
-            BatchTrainer bt2train = prefetchAndGetBatchTrainer(tagger2, trainData, modelPath + ".level2.prefetchedTrainData");
+            WeightedBatchTrainer bt2train = prefetchAndGetBatchTrainer(tagger2, trainData, modelPath + ".level2.prefetchedTrainData");
 
             bt2train.train(fixedNumIterations);
         }
@@ -312,7 +315,7 @@ public class LORELEIRunner {
 
     }
 
-    public static class DataSetReader implements Parser {
+    public static class DataSetReader extends WeightedParser {
         public Data dataset = null;
         int docid = 0;
         int sentenceId =0;
@@ -332,7 +335,12 @@ public class LORELEIRunner {
                 return null;
             }
 
-            Object res =  dataset.documents.get(docid).sentences.get(sentenceId).get(tokenId);
+            NEWord res =  (NEWord) dataset.documents.get(docid).sentences.get(sentenceId).get(tokenId);
+
+            if (res.neLabel.equals("O")){
+                res.setWeight(0.005);
+            }
+
             if(tokenId < dataset.documents.get(docid).sentences.get(sentenceId).size()-1)
                 tokenId++;
             else {
