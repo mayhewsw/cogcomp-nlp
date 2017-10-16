@@ -26,11 +26,13 @@ echo "Logging to:" $OUTF
 #TRAIN=$TRAIN,/shared/corpora/corporaWeb/lorelei/evaluation-20170804/il6/set1/data/twitter/conll-anno-annotation-steve
 #TRAIN=$TRAIN,/shared/corpora/corporaWeb/lorelei/evaluation-20170804/il6/dev/conll
 
+TRAIN=/scratch/mayhew2/python-translate/$LANG/Train/$LANG.conll
+
 ## OLD
 #TRAIN=/shared/corpora/ner/translate/eng/Train-ta3/
 #TRAIN=/shared/corpora/ner/translate/$LANG/Train-translit,
 #TRAIN=/shared/corpora/ner/eval/column/final-mayhew2-stem-orig
-TRAIN=/shared/corpora/ner/lorelei/$LANG/Train-rules-keep0.25-dense-w3/
+#TRAIN=/shared/corpora/ner/lorelei/$LANG/Train-rules-keep0.25-dense-w3/
 #TRAIN=/shared/corpora/ner/wikifier-features/$LANG/train-camera3/
 #TRAIN=/shared/corpora/ner/conll2003/eng/Train/
 #TRAIN=/shared/corpora/ner/hengji/$LANG/10k/1rl-mayhew2
