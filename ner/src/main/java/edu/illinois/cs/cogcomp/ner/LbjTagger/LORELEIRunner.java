@@ -5,9 +5,7 @@ import edu.illinois.cs.cogcomp.core.io.IOUtils;
 import edu.illinois.cs.cogcomp.core.io.LineIO;
 import edu.illinois.cs.cogcomp.core.utilities.StringUtils;
 import edu.illinois.cs.cogcomp.lbjava.classify.TestDiscrete;
-import edu.illinois.cs.cogcomp.lbjava.learn.BatchTrainer;
-import edu.illinois.cs.cogcomp.lbjava.learn.SparseNetworkLearner;
-import edu.illinois.cs.cogcomp.lbjava.learn.WeightedBatchTrainer;
+import edu.illinois.cs.cogcomp.lbjava.learn.*;
 import edu.illinois.cs.cogcomp.lbjava.parse.LinkedChild;
 import edu.illinois.cs.cogcomp.lbjava.parse.LinkedVector;
 import edu.illinois.cs.cogcomp.lbjava.parse.Parser;
@@ -28,10 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * ACLRunner class. For ACL2016
@@ -90,6 +85,11 @@ public class LORELEIRunner {
         boolean areWeTraining = cmd.hasOption("train");
         Parameters.readConfigAndLoadExternalData(config, areWeTraining);
         String modelpath = ParametersForLbjCode.currentParameters.pathToModelFile;
+        if(modelpath.startsWith("tmp") || modelpath.length() == 0){
+            Random r = new Random();
+            modelpath = "/tmp/nermodel" + r.nextInt();
+        }
+
 
         if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("Embedding")) {
             if(ParametersForLbjCode.currentParameters.testlang.equals("en"))
@@ -225,7 +225,14 @@ public class LORELEIRunner {
             WeightedBatchTrainer bt2train = prefetchAndGetBatchTrainer(tagger2, trainData, modelPath + ".level2.prefetchedTrainData");
 
             bt2train.train(fixedNumIterations);
+
         }
+
+        for(Object o : tagger1.getNetwork().toArray()){
+            WeightedSparseAveragedPerceptron wsap = (WeightedSparseAveragedPerceptron) o;
+            System.out.println("Bias: " + wsap.getBias());
+
+        };
 
         logger.info("Saving model to path: " + modelPath);
         tagger1.save();
@@ -263,6 +270,10 @@ public class LORELEIRunner {
             //LineIO.write("/shared/corpora/ner/system-outputs/"+testlang+"/projection-fa/" + doc.docname, docpreds);
         }
         //logger.info("Just wrote to: " + "/shared/corpora/ner/system-outputs/"+testlang+ "/projection-fa/");
+
+
+        String outdatapath = modelPath + ".testdata";
+        TaggedDataWriter.writeToFile(outdatapath, testData, "-c", NEWord.LabelToLookAt.PredictionLevel2Tagger);
 
         LineIO.write("gold-pred-" + testlang + ".txt", results);
 

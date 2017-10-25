@@ -1,0 +1,2 @@
+# this will show the last file in the logs directory.
+less logs/`ls -rc logs | tail -n 1`
