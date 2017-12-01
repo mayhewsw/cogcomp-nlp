@@ -113,6 +113,32 @@ public class TaggedDataWriter {
     }
 
     private static String toColumnsFormat(Data data, NEWord.LabelToLookAt labelType) {
+
+//        double min = 1;
+//        double max = 0;
+//        for (int did = 0; did < data.documents.size(); did++) {
+//            for (int i = 0; i < data.documents.get(did).sentences.size(); i++) {
+//                LinkedVector vector = data.documents.get(did).sentences.get(i);
+//                for (int j = 0; j < vector.size(); j++) {
+//                    NEWord w = (NEWord) vector.get(j);
+//                    double conf = w.predictionConfidencesLevel1Classifier.topScores.elementAt(0);
+//                    if (w.getPrediction(labelType).equals("O")){
+//                        if(conf > max){
+//                            max = conf;
+//                        }
+//                        if(conf < min && conf > 0.9999){
+//                            min = conf;
+//                        }
+//                    }
+//                }
+//
+//            }
+//        }
+//
+//        System.out.println("Max: " + max);
+//        System.out.println("Min: " + min);
+
+
         StringBuilder res = new StringBuilder(data.documents.size() * 1000);
         for (int did = 0; did < data.documents.size(); did++) {
             for (int i = 0; i < data.documents.get(did).sentences.size(); i++) {
@@ -121,8 +147,25 @@ public class TaggedDataWriter {
                     res.append("O	0	0	O	-X-	-DOCSTART-	x	x	0\n\n");
                 for (int j = 0; j < vector.size(); j++) {
                     NEWord w = (NEWord) vector.get(j);
+
+                    // THIS IS A MAJOR HACK!!!
+                    // I WANT TO ONLY PRINT THE SCORE OF THE POSITIVE CLASS.
+                    double conf = w.predictionConfidencesLevel1Classifier.topScores.elementAt(0);
+                    if(w.getPrediction(labelType).equals("O")){
+                        conf = w.predictionConfidencesLevel1Classifier.topScores.elementAt(1);
+                    }
+
+                    //conf = (conf - min) / (max - min);
+                    //if(conf < 0){
+                    //    conf = 0;
+                    //}
+
+//                    if(!w.getPrediction(labelType).equals("O")){
+//                        conf = 1.0;
+//                    }
+
                     res.append(w.getPrediction(labelType)).append("\t").append(j).append("\t" + w.start + "\t").append(w.end + "\t")
-                            .append("O\t").append(w.form).append("\tx\tx\t0\n");
+                            .append("O\t").append(w.form).append("\t" + conf).append("\tx\t0\n");
                 }
                 res.append("\n");
             }

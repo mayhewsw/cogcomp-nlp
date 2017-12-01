@@ -29,16 +29,16 @@ public class Decoder {
     /**
      * If you don't wanna use some of the classifiers - pass null parameters.
      */
-    public static void annotateDataBIO(Data data, NETaggerLevel1 taggerLevel1,
-            NETaggerLevel2 taggerLevel2) throws Exception {
+    public static void annotateDataBIO(Data data, SparseNetworkLearner taggerLevel1,
+            SparseNetworkLearner taggerLevel2) throws Exception {
         Decoder.annotateBIO_AllLevelsWithTaggers(data, taggerLevel1, taggerLevel2);
     }
 
     /**
      * use taggerLevel2=null if you want to use only one level of inference
      */
-    protected static void annotateBIO_AllLevelsWithTaggers(Data data, NETaggerLevel1 taggerLevel1,
-            NETaggerLevel2 taggerLevel2) throws Exception {
+    protected static void annotateBIO_AllLevelsWithTaggers(Data data, SparseNetworkLearner taggerLevel1,
+            SparseNetworkLearner taggerLevel2) throws Exception {
 
         clearPredictions(data);
         NETaggerLevel1.isTraining = false;

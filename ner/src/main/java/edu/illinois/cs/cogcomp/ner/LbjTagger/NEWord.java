@@ -36,6 +36,8 @@ public class NEWord extends Word implements WeightedObject
 
 
 	public double weight = 1.0;
+	public int entdist = -1;
+	public double freq = 0.0;
 
 
 	public String originalSpelling="";
@@ -158,6 +160,27 @@ public class NEWord extends Word implements WeightedObject
 	public void setWeight(double w){
 		this.weight = w;
 	}
+
+	/**
+	 * Distance from the nearest entity (must be specified in data)
+	 * @return
+	 */
+	public int getEntDist(){
+		return this.entdist;
+	}
+
+	public void setEntDist(int w){
+		this.entdist = w;
+	}
+
+	public double getFreq(){
+		return this.freq;
+	}
+
+	public void setFreq(double f){
+		this.freq = f;
+	}
+
 
 	/**
 	 * Produces a simple <code>String</code> representation of this word in

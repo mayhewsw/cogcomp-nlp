@@ -16,6 +16,7 @@ import edu.illinois.cs.cogcomp.lbjava.learn.SparseAveragedPerceptron;
 import edu.illinois.cs.cogcomp.lbjava.learn.SparseNetworkLearner;
 import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel1;
 import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel2;
+import edu.illinois.cs.cogcomp.ner.LbjFeatures.OnonOtagger;
 import edu.illinois.cs.cogcomp.ner.LbjTagger.Parameters;
 import edu.illinois.cs.cogcomp.ner.LbjTagger.ParametersForLbjCode;
 import edu.illinois.cs.cogcomp.core.io.LineIO;
@@ -234,18 +235,59 @@ public class Sandbox {
 //    }
 
 
+    public static void dd(){
+        String model = "/tmp/nermodel-127794978";
+
+        NETaggerLevel1 tagger1 = new NETaggerLevel1(model + ".level1", model + ".level1.lex");
+
+//
+    }
+
+
     public static void main(String[] args) throws Exception {
 //        Parameters.readConfigAndLoadExternalData("config/tacl/ti.config", false);
 //        ParametersForLbjCode cp = ParametersForLbjCode.currentParameters;
 //        String model = cp.pathToModelFile;
 //        //String model = "models/trans-ug/mono";
 //
-        String model = "/tmp/nermodel-821932903";
 
-        NETaggerLevel1 tagger1 = new NETaggerLevel1(model + ".level1", model + ".level1.lex");
+        List<String> lines = LineIO.read("ner/data.test");
+        for(String line: lines){
+            String[] terms = line.split("\\s+");
+
+            String classStr = terms[0];
+            // In SVMLight +1 and 1 are the same label.
+            // Adding a special case to normalize...
+            if (classStr.equals("+1")) {
+                classStr = "1";
+            }
+
+
+            // the rest are feature-value pairs
+            ArrayList<Integer> indices = new ArrayList<Integer>();
+            ArrayList<Double> values = new ArrayList<Double>();
+            for (int termIndex = 1; termIndex < terms.length; termIndex++) {
+                if (!terms[termIndex].equals("")) {
+                    String[] s = terms[termIndex].split(":");
+                    if (s.length != 2) {
+                        System.out.println(line);
+
+                        throw new RuntimeException("invalid format: " + terms[termIndex] + " (should be feature:value)");
+                    }
+                    String feature = s[0];
+                }
+            }
+        }
+
+//        dd();
+//        System.exit(-1);
+//
+//        String model = "/tmp/nermodel-127794978";
+
+//        OnonOtagger tagger1 = new OnonOtagger(model + ".level1", model + ".level1.lex");
 //        NETaggerLevel2 tagger2 = new NETaggerLevel2(cp.pathToModelFile + ".level2", cp.pathToModelFile + ".level2.lex");
 //
-        getFeatureWeights(tagger1);
+//        getFeatureWeights(tagger1);
 //        System.exit(0);
 
 

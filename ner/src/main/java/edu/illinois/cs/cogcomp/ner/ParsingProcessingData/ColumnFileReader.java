@@ -51,6 +51,14 @@ class ColumnFileReader extends ColumnFormat {
             w.setWeight(Double.parseDouble(line[6]));
         }
 
+        if(!line[7].equals("x")){
+            w.setEntDist(Integer.parseInt(line[7]));
+        }
+
+        if(!line[8].equals("0")){
+            w.setFreq(Double.parseDouble(line[8]));
+        }
+
         if(line.length > 10) {
             w.addWikifierFeatures(Arrays.copyOfRange(line, 10, line.length));
         }
@@ -67,6 +75,14 @@ class ColumnFileReader extends ColumnFormat {
 
             if(!line[6].equals("x")){
                 w.setWeight(Double.parseDouble(line[6]));
+            }
+
+            if(!line[7].equals("x")){
+                w.setEntDist(Integer.parseInt(line[7]));
+            }
+
+            if(!line[8].equals("0")){
+                w.setFreq(Double.parseDouble(line[8]));
             }
 
             if(line.length > 10) {

@@ -1,41 +1,34 @@
 package edu.illinois.cs.cogcomp.ner.LbjTagger;
 
-import edu.illinois.cs.cogcomp.core.datastructures.Pair;
 import edu.illinois.cs.cogcomp.core.io.IOUtils;
-import edu.illinois.cs.cogcomp.core.io.LineIO;
-import edu.illinois.cs.cogcomp.core.utilities.StringUtils;
-import edu.illinois.cs.cogcomp.lbjava.classify.TestDiscrete;
-import edu.illinois.cs.cogcomp.lbjava.learn.*;
-import edu.illinois.cs.cogcomp.lbjava.parse.LinkedChild;
+import edu.illinois.cs.cogcomp.lbjava.learn.SparseNetworkLearner;
+import edu.illinois.cs.cogcomp.lbjava.learn.WeightedBatchTrainer;
 import edu.illinois.cs.cogcomp.lbjava.parse.LinkedVector;
-import edu.illinois.cs.cogcomp.lbjava.parse.Parser;
 import edu.illinois.cs.cogcomp.lbjava.parse.WeightedParser;
 import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.ExpressiveFeaturesAnnotator;
 import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.TwoLayerPredictionAggregationFeatures;
 import edu.illinois.cs.cogcomp.ner.InferenceMethods.Decoder;
 import edu.illinois.cs.cogcomp.ner.InferenceMethods.PredictionsAndEntitiesConfidenceScores;
-import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel1;
-import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel2;
-import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.TaggedDataReader;
+import edu.illinois.cs.cogcomp.ner.LbjFeatures.OnonOtagger;
 import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.TaggedDataWriter;
-import edu.illinois.cs.cogcomp.ner.WordEmbedding;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * ACLRunner class. For ACL2016
  * Created by mayhew2 on 3/15/16.
  */
 @SuppressWarnings("Duplicates")
-public class LORELEIRunner {
+public class OnonORunner {
 
-    private static final Logger logger = LoggerFactory.getLogger(LORELEIRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger(OnonORunner.class);
     public static final String filesFormat = "-c";
 
     public static String config = null;
@@ -56,8 +49,14 @@ public class LORELEIRunner {
                 .hasArg()
                 .build();
 
-        Option testpath = Option.builder("test")
-                .argName("path")
+        Option inputpath = Option.builder("input")
+                .argName("inputpath")
+                .hasArg()
+                .required()
+                .build();
+
+        Option outputpath = Option.builder("output")
+                .argName("outputpath")
                 .hasArg()
                 .required()
                 .build();
@@ -71,7 +70,8 @@ public class LORELEIRunner {
 
         options.addOption(help);
         options.addOption(trainpath);
-        options.addOption(testpath);
+        options.addOption(inputpath);
+        options.addOption(outputpath);
         options.addOption(langopt);
         options.addOption(configfile);
 
@@ -84,20 +84,12 @@ public class LORELEIRunner {
 
         boolean areWeTraining = cmd.hasOption("train");
         Parameters.readConfigAndLoadExternalData(config, areWeTraining);
-        String modelpath = ParametersForLbjCode.currentParameters.pathToModelFile;
+        String modelpath = "tmp"; //ParametersForLbjCode.currentParameters.pathToModelFile;
         if(modelpath.startsWith("tmp") || modelpath.length() == 0){
             Random r = new Random();
             modelpath = "/tmp/nermodel" + r.nextInt();
         }
-
-
-        if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("Embedding")) {
-            if(ParametersForLbjCode.currentParameters.testlang.equals("en"))
-                WordEmbedding.setMonoVecsNew("en");
-            else
-                WordEmbedding.loadMultiDBNew(ParametersForLbjCode.currentParameters.testlang);
-        }
-
+        
         if(cmd.hasOption("train")){
             int trainiter = 30;
             String trainroot = cmd.getOptionValue("train");
@@ -107,14 +99,10 @@ public class LORELEIRunner {
         }
 
         // should be always... it's required.
-        if(cmd.hasOption("test")){
-            String testroot = cmd.getOptionValue("test");
-            String lang = cmd.getOptionValue("lang");
-            Data testData = loaddata(testroot, filesFormat, false);
-            Pair<Double, Double> levels  = RunTest(testData, modelpath, lang);
-            System.out.println("Tested on: " + testroot);
-        }
 
+        String testroot = cmd.getOptionValue("input");
+        Data testData = loaddata(testroot, filesFormat, false);
+        WriteOutput(testData, modelpath, cmd.getOptionValue("output"));
     }
 
     /**
@@ -141,7 +129,7 @@ public class LORELEIRunner {
 
         return data;
     }
-
+    
     /**
      * @param classifier
      * @param dataSet
@@ -199,9 +187,9 @@ public class LORELEIRunner {
 
         IOUtils.cp(config, modelPath + "/" + FilenameUtils.getName(config));
 
-        NETaggerLevel1 tagger1 = new NETaggerLevel1(modelPath + ".level1", modelPath + ".level1.lex");
+        OnonOtagger tagger1 = new OnonOtagger(modelPath + ".level1", modelPath + ".level1.lex");
         tagger1.forget();
-        //NETaggerLevel1 tagger1 = new NETaggerLevel1();
+        //OnonOtagger tagger1 = new OnonOtagger();
 
         if (ParametersForLbjCode.currentParameters.featuresToUse.containsKey("PredictionsLevel1")) {
             PredictionsAndEntitiesConfidenceScores.getAndMarkEntities(trainData, NEWord.LabelToLookAt.GoldLabel);
@@ -215,36 +203,16 @@ public class LORELEIRunner {
         logger.info("Training...");
         bt1train.train(fixedNumIterations);
 
-        NETaggerLevel2 tagger2 = new NETaggerLevel2(modelPath + ".level2", modelPath + ".level2.lex");
-        tagger2.forget();
-
-        // Previously checked if PatternFeatures was in featuresToUse.
-        if (ParametersForLbjCode.currentParameters.featuresToUse.containsKey("PredictionsLevel1")) {
-
-            logger.info("Pre-extracting the training data for Level 2 classifier");
-            WeightedBatchTrainer bt2train = prefetchAndGetBatchTrainer(tagger2, trainData, modelPath + ".level2.prefetchedTrainData");
-
-            bt2train.train(fixedNumIterations);
-
-        }
-
-        for(Object o : tagger1.getNetwork().toArray()){
-            WeightedSparseAveragedPerceptron wsap = (WeightedSparseAveragedPerceptron) o;
-            System.out.println("Bias: " + wsap.getBias());
-
-        };
 
         logger.info("Saving model to path: " + modelPath);
         tagger1.save();
-        tagger2.save();
     }
 
-    public static Pair<Double, Double> RunTest(Data testData, String modelPath, String testlang) throws Exception {
+    public static void WriteOutput(Data testData, String modelPath, String outdatapath) throws Exception {
 
-        NETaggerLevel1 tagger1 = new NETaggerLevel1(modelPath + ".level1", modelPath + ".level1.lex");
-        NETaggerLevel2 tagger2 = new NETaggerLevel2(modelPath + ".level2", modelPath + ".level2.lex");
+        OnonOtagger tagger1 = new OnonOtagger(modelPath + ".level1", modelPath + ".level1.lex");
 
-        Decoder.annotateDataBIO(testData, tagger1, tagger2);
+        Decoder.annotateDataBIO(testData, tagger1, null);
 
         ArrayList<String> results = new ArrayList<>();
         results.add("word\tgold\tpred");
@@ -256,10 +224,11 @@ public class LORELEIRunner {
             for (int k = 0; k < sentences.size(); k++){
                 for (int i = 0; i < sentences.get(k).size() ; ++i){
                     NEWord w = (NEWord)sentences.get(k).get(i);
+                    double conf = w.predictionConfidencesLevel1Classifier.topScores.elementAt(0);
                     if(!w.neLabel.equals(w.neTypeLevel2)) {
-                        results.add("***" + w.form + "\t" + w.neLabel + "\t" + w.neTypeLevel2);
+                        results.add("***" + w.form + "\t" + w.neLabel + "\t" + w.neTypeLevel2 + "\t" + conf);
                     }else{
-                        results.add(w.form + "\t" + w.neLabel + "\t" + w.neTypeLevel2);
+                        results.add(w.form + "\t" + w.neLabel + "\t" + w.neTypeLevel2 + "\t" + conf);
                     }
                     docpreds.add(ACLRunner.conllline(w.neTypeLevel2, i, w.form));
                 }
@@ -267,62 +236,10 @@ public class LORELEIRunner {
                 docpreds.add("");
             }
 
-            //LineIO.write("/shared/corpora/ner/system-outputs/"+testlang+"/projection-fa/" + doc.docname, docpreds);
+            TaggedDataWriter.writeToFile(outdatapath + "/" + doc.docname, testData, "-c", NEWord.LabelToLookAt.PredictionLevel2Tagger);
+            System.out.println("Wrote "+ doc.docname + " to " + outdatapath);
         }
-        //logger.info("Just wrote to: " + "/shared/corpora/ner/system-outputs/"+testlang+ "/projection-fa/");
 
-
-        String outdatapath = modelPath + ".testdata";
-        TaggedDataWriter.writeToFile(outdatapath, testData, "-c", NEWord.LabelToLookAt.PredictionLevel2Tagger);
-
-        LineIO.write("gold-pred-" + testlang + ".txt", results);
-
-        TestDiscrete resultsPhraseLevel1 = new TestDiscrete();
-        resultsPhraseLevel1.addNull("O");
-        TestDiscrete resultsTokenLevel1 = new TestDiscrete();
-        resultsTokenLevel1.addNull("O");
-
-        TestDiscrete resultsPhraseLevel2 = new TestDiscrete();
-        resultsPhraseLevel2.addNull("O");
-        TestDiscrete resultsTokenLevel2 = new TestDiscrete();
-        resultsTokenLevel2.addNull("O");
-
-        TestDiscrete resultsByBILOU = new TestDiscrete();
-        TestDiscrete resultsSegmentation = new TestDiscrete();
-        resultsByBILOU.addNull("O");
-        resultsSegmentation.addNull("O");
-
-        NETesterMultiDataset.reportPredictions(testData,
-                resultsTokenLevel1,
-                resultsTokenLevel2,
-                resultsPhraseLevel1,
-                resultsPhraseLevel2,
-                resultsByBILOU,
-                resultsSegmentation);
-
-        System.out.println("------------------------------------------------------------");
-        System.out.println("******	Combined performance on all the datasets :");
-        System.out.println("\t>>> Dataset path : \t" + testData.datasetPath);
-        System.out.println("------------------------------------------------------------");
-
-        System.out.println("Phrase-level Acc Level2:");
-        resultsPhraseLevel2.printPerformance(System.out);
-        System.out.println("Token-level Acc Level2:");
-        resultsTokenLevel2.printPerformance(System.out);
-        System.out.println("Phrase-level Acc Level1:");
-        resultsPhraseLevel1.printPerformance(System.out);
-        System.out.println("Token-level Acc Level1:");
-        resultsTokenLevel1.printPerformance(System.out);
-
-        System.out.println("------------------------------------------------------------");
-        System.out.println("\t Level 1 F1 Phrase-level: " + resultsPhraseLevel1.getOverallStats()[2]);
-        System.out.println("\t Level 2 F1 Phrase-level: " + resultsPhraseLevel2.getOverallStats()[2]);
-
-        System.out.println("------------------------------------------------------------");
-        System.out.println("************************************************************");
-        System.out.println("------------------------------------------------------------");
-
-        return new Pair<>(resultsPhraseLevel1.getOverallStats()[2], resultsPhraseLevel2.getOverallStats()[2]);
 
     }
 
