@@ -47,12 +47,18 @@ class ColumnFileReader extends ColumnFormat {
             w = new NEWord(new Word(line[5], line[4]), null, line[0]);
         }
 
-        if(!line[6].equals("x")){
-            w.setWeight(Double.parseDouble(line[6]));
+        try{
+            double d = Double.parseDouble(line[6]);
+            w.setWeight(d);
+        }catch (NumberFormatException e) {
+            // don't care.
         }
 
-        if(!line[7].equals("x")){
-            w.setEntDist(Integer.parseInt(line[7]));
+        try{
+            int i = Integer.parseInt(line[7]);
+            w.setEntDist(i);
+        }catch (NumberFormatException e) {
+            // don't care.
         }
 
         if(!line[8].equals("0")){
@@ -73,10 +79,14 @@ class ColumnFileReader extends ColumnFormat {
                 w = new NEWord(new Word(line[5], line[4]), null, line[0]);
             }
 
-            if(!line[6].equals("x")){
-                w.setWeight(Double.parseDouble(line[6]));
+            try{
+                double d = Double.parseDouble(line[6]);
+                w.setWeight(d);
+            }catch (NumberFormatException e) {
+                // don't care.
             }
 
+            
             if(!line[7].equals("x")){
                 w.setEntDist(Integer.parseInt(line[7]));
             }

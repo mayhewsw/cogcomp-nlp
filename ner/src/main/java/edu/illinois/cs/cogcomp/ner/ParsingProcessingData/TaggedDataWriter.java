@@ -15,7 +15,11 @@ import edu.illinois.cs.cogcomp.ner.LbjTagger.Data;
 import edu.illinois.cs.cogcomp.ner.LbjTagger.NERDocument;
 import edu.illinois.cs.cogcomp.ner.LbjTagger.NEWord;
 import edu.illinois.cs.cogcomp.lbjava.parse.LinkedVector;
+import edu.illinois.cs.cogcomp.core.utilities.StringUtils;
 
+import java.util.List;
+import java.util.Vector;
+import java.util.ArrayList;
 import java.io.IOException;
 
 public class TaggedDataWriter {
@@ -148,24 +152,19 @@ public class TaggedDataWriter {
                 for (int j = 0; j < vector.size(); j++) {
                     NEWord w = (NEWord) vector.get(j);
 
-                    // THIS IS A MAJOR HACK!!!
-                    // I WANT TO ONLY PRINT THE SCORE OF THE POSITIVE CLASS.
-                    double conf = w.predictionConfidencesLevel1Classifier.topScores.elementAt(0);
-                    if(w.getPrediction(labelType).equals("O")){
-                        conf = w.predictionConfidencesLevel1Classifier.topScores.elementAt(1);
+                    Vector<Double> topScores = w.predictionConfidencesLevel1Classifier.topScores;
+                    Vector<String> topWords = w.predictionConfidencesLevel1Classifier.topWords;
+
+                    List<String> weights = new ArrayList<>();
+                    for(int k = 0; k < topScores.size(); k++){
+                        double score = topScores.get(k);
+                        String tag = topWords.get(k);
+                        weights.add(tag + ":" + String.format( "%.2f", score ));
                     }
-
-                    //conf = (conf - min) / (max - min);
-                    //if(conf < 0){
-                    //    conf = 0;
-                    //}
-
-//                    if(!w.getPrediction(labelType).equals("O")){
-//                        conf = 1.0;
-//                    }
-
+                    String weightstring = StringUtils.join(",", weights); 
+                                        
                     res.append(w.getPrediction(labelType)).append("\t").append(j).append("\t" + w.start + "\t").append(w.end + "\t")
-                            .append("O\t").append(w.form).append("\t" + conf).append("\tx\t0\n");
+                            .append("O\t").append(w.form).append("\t" + weightstring).append("\tx\t0\n");
                 }
                 res.append("\n");
             }
