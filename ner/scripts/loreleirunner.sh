@@ -23,19 +23,19 @@ CONFIG=config/tacl/$LANG.config
 #TRAIN=/tmp/mydir/train2
 #TRAIN=/shared/corpora/ner/conll2003/eng/Train-oracle
 #TRAIN=/shared/corpora/ner/conll2003/eng/Train-sample
-#TRAIN=ilp/ilp.model.testdata.weighted
-#TRAIN=ilp/ilp.model.testdata.weights
-#TRAIN=/shared/corpora/ner/conll2003/eng/Train-dense
-#TRAIN=/shared/corpora/ner/conll2003/eng/Train-0.25-mention-weighted
-#TRAIN=/shared/corpora/ner/conll2003/eng/Train-tmp-weighted
-TRAIN=/shared/corpora/ner/conll2003/eng/Train-0.25-weighted
+TRAIN=ilp/ilp.model.testdata.weightedmulticlass
+#TRAIN=ilp/ilp.model.testdata.best.predsasweights
+#TRAIN=/shared/corpora/ner/conll2003/eng/Train-p0.9-r0.25-mention-weighted
+#TRAIN=/shared/corpora/ner/conll2003/eng/Train-0.25-weighted/
+#TRAIN=ilp/ilp.model.testdata.trueoracle.predsasweights
+#TRAIN=/shared/corpora/ner/conll2003/deu/Train
 
 #TEST=/shared/corpora/ner/lorelei/$LANG/Train-0.25-weighted
 #TEST=/shared/corpora/ner/lorelei/$LANG/Test-mention
 #TEST=/shared/corpora/ner/conll2003/eng/Test-mention
 #TEST=/shared/corpora/ner/conll2003/eng/Train-mention
-TEST=/shared/corpora/ner/conll2003/eng/Dev
-#TEST=/shared/corpora/ner/conll2003/eng/Train
+#TEST=/shared/corpora/ner/conll2003/deu/Dev
+TEST=/shared/corpora/ner/conll2003/eng/Train
 
 
 
