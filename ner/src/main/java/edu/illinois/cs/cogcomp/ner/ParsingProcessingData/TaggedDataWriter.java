@@ -24,7 +24,7 @@ import java.io.IOException;
 
 public class TaggedDataWriter {
     public static void writeToFile(String outputFile, Data data, String fileFormat,
-            NEWord.LabelToLookAt labelType) throws IOException {
+                                   NEWord.LabelToLookAt labelType) throws IOException {
         OutFile out = new OutFile(outputFile);
         if (fileFormat.equalsIgnoreCase("-r"))
             out.println(toBracketsFormat(data, labelType));
@@ -38,6 +38,21 @@ public class TaggedDataWriter {
         }
         out.close();
     }
+
+    public static void writeToFile(String outputFile, NERDocument doc, String fileFormat,
+                                   NEWord.LabelToLookAt labelType) throws IOException {
+        OutFile out = new OutFile(outputFile);
+
+        if (fileFormat.equalsIgnoreCase("-c"))
+            out.println(toColumnsFormat(doc, labelType));
+        else {
+            throw new IOException(
+                    "Unknown file format (only option -c is supported): " + fileFormat);
+        }
+
+        out.close();
+    }
+
 
     public static void writeToFolder(String outputFolder, Data data, String fileFormat,
                                    NEWord.LabelToLookAt labelType) throws IOException {
@@ -155,14 +170,16 @@ public class TaggedDataWriter {
                     Vector<Double> topScores = w.predictionConfidencesLevel1Classifier.topScores;
                     Vector<String> topWords = w.predictionConfidencesLevel1Classifier.topWords;
 
-                    List<String> weights = new ArrayList<>();
+                    StringBuilder weightstring = new StringBuilder();
                     for(int k = 0; k < topScores.size(); k++){
+                        if(weightstring.length() > 0){
+                            weightstring.append(",");
+                        }
                         double score = topScores.get(k);
                         String tag = topWords.get(k);
-                        weights.add(tag + ":" + String.format( "%.2f", score ));
+                        weightstring.append(tag + ":" + String.format( "%.2f", score ));
                     }
-                    String weightstring = StringUtils.join(",", weights); 
-                                        
+
                     res.append(w.getPrediction(labelType)).append("\t").append(j).append("\t" + w.start + "\t").append(w.end + "\t")
                             .append("O\t").append(w.form).append("\t" + weightstring).append("\tx\t0\n");
                 }
@@ -187,8 +204,22 @@ public class TaggedDataWriter {
                 res.append("O	0	0	O	-X-	-DOCSTART-	x	x	0\n\n");
             for (int j = 0; j < vector.size(); j++) {
                 NEWord w = (NEWord) vector.get(j);
-                res.append(w.getPrediction(labelType)).append("\t0\t").append(j)
-                        .append("\tO\tO\t").append(w.form).append("\tx\tx\t0\n");
+
+                Vector<Double> topScores = w.predictionConfidencesLevel1Classifier.topScores;
+                Vector<String> topWords = w.predictionConfidencesLevel1Classifier.topWords;
+
+                StringBuilder weightstring = new StringBuilder();
+                for(int k = 0; k < topScores.size(); k++){
+                    if(weightstring.length() > 0){
+                        weightstring.append(",");
+                    }
+                    double score = topScores.get(k);
+                    String tag = topWords.get(k);
+                    weightstring.append(tag + ":" + String.format( "%.2f", score ));
+                }
+
+                res.append(w.getPrediction(labelType)).append("\t").append(j).append("\t" + w.start + "\t").append(w.end + "\t")
+                        .append("O\t").append(w.form).append("\t" + weightstring).append("\tx\t0\n");
             }
             res.append("\n");
         }

@@ -1,32 +1,18 @@
 package edu.illinois.cs.cogcomp.ner;
 
-import edu.illinois.cs.cogcomp.core.datastructures.IntPair;
 import edu.illinois.cs.cogcomp.core.datastructures.Pair;
-import edu.illinois.cs.cogcomp.core.datastructures.ViewNames;
-import edu.illinois.cs.cogcomp.core.datastructures.textannotation.Constituent;
-import edu.illinois.cs.cogcomp.core.datastructures.textannotation.TextAnnotation;
-import edu.illinois.cs.cogcomp.core.datastructures.textannotation.View;
-import edu.illinois.cs.cogcomp.lbjava.classify.DiscreteConjunctiveFeature;
-import edu.illinois.cs.cogcomp.lbjava.classify.DiscreteFeature;
-import edu.illinois.cs.cogcomp.lbjava.classify.DiscretePrimitiveStringFeature;
-import edu.illinois.cs.cogcomp.lbjava.classify.Feature;
-import edu.illinois.cs.cogcomp.lbjava.learn.Learner;
-import edu.illinois.cs.cogcomp.lbjava.learn.Lexicon;
-import edu.illinois.cs.cogcomp.lbjava.learn.SparseAveragedPerceptron;
-import edu.illinois.cs.cogcomp.lbjava.learn.SparseNetworkLearner;
-import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel1;
-import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel2;
-import edu.illinois.cs.cogcomp.ner.LbjFeatures.OnonOtagger;
-import edu.illinois.cs.cogcomp.ner.LbjTagger.Parameters;
-import edu.illinois.cs.cogcomp.ner.LbjTagger.ParametersForLbjCode;
 import edu.illinois.cs.cogcomp.core.io.LineIO;
-import edu.illinois.cs.cogcomp.nlp.corpusreaders.CoNLLNerReader;
+import edu.illinois.cs.cogcomp.lbjava.learn.Lexicon;
+import edu.illinois.cs.cogcomp.lbjava.learn.SparseNetworkLearner;
 import org.apache.commons.lang3.StringUtils;
 
-
-import java.io.*;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by stephen on 7/19/16.
@@ -233,16 +219,6 @@ public class Sandbox {
 //        System.out.println("Writing to models/hash/mine.model.level1{.lex}");
 //        c.write("models/hash/mine.model.level1", "models/hash/mine.model.level1.lex");
 //    }
-
-
-    public static void dd(){
-        String model = "/tmp/nermodel-127794978";
-
-        NETaggerLevel1 tagger1 = new NETaggerLevel1(model + ".level1", model + ".level1.lex");
-
-//
-    }
-
 
     public static void main(String[] args) throws Exception {
 //        Parameters.readConfigAndLoadExternalData("config/tacl/ti.config", false);

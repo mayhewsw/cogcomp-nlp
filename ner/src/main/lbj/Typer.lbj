@@ -1,0 +1,68 @@
+package edu.illinois.cs.cogcomp.ner.LbjFeatures;
+
+import java.util.*;
+
+import edu.illinois.cs.cogcomp.ner.LbjTagger.Mention;
+import edu.illinois.cs.cogcomp.ner.LanguageSpecificNormalizer;
+import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.WordTopicAndLayoutFeatures;
+import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.BrownClusters;
+import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.Gazetteers;
+import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.WordEmbeddings;
+import edu.illinois.cs.cogcomp.ner.LbjTagger.ParametersForLbjCode;
+import edu.illinois.cs.cogcomp.ner.StringStatisticsUtils.*;
+
+  
+//---------------- CLASSIFIER LEVEL 1 -------------------
+
+
+discrete% MForms(Mention mnt) <-
+{
+        int len = mnt.leftcontext.length;
+        for(int i = 0; i < mnt.leftcontext.length; i++){
+            String w = mnt.leftcontext[i];
+            sense -len + i : w.toLowerCase();
+        }
+
+        for(int i = 0; i < mnt.words.length; i++){
+            sense "inside-" + i : mnt.words[i];
+            sense "contains-"  : mnt.words[i];
+        }
+
+        len = mnt.rightcontext.length;
+        for(int i = 0; i < mnt.rightcontext.length; i++){
+            String w = mnt.rightcontext[i];
+            sense i+1 : w.toLowerCase();
+        }
+}
+
+discrete% MWordType(Mention mnt) <-
+{
+    boolean allcap = true;
+    for(int i = 0; i < mnt.words.length; i++){
+        for(int j = 0; j < mnt.words[i].length(); j++){
+            allcap = allcap && Character.isUpperCase(mnt.words[i].charAt(j));
+        }
+    }
+    sense "allcap" : allcap;
+
+}
+
+discrete% MAffixes(Mention mnt) <-
+{
+        for(int i = 0; i < mnt.prefixes.size(); i++){
+            sense "prefix" + i : mnt.prefixes.get(i);
+        }
+        for(int i = 0; i < mnt.suffixes.size(); i++){
+            sense "suffix" + i : mnt.suffixes.get(i);
+        }
+}
+
+discrete MNELabel(Mention mnt) <- { return mnt.neLabel; }
+
+
+discrete Typer(Mention m)  <-
+learn MNELabel
+    using MForms, MWordType, MAffixes
+  with new SparseNetworkLearner(new WeightedSparseAveragedPerceptron(0.1, 0, 10))
+  progressOutput 10000
+end

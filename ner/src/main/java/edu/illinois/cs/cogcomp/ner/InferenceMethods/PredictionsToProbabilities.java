@@ -63,8 +63,11 @@ class PredictionsToProbabilities {
 
         CharacteristicWords res = new CharacteristicWords(scores.length);
 
-        for (int i = 0; i < scores.length; i++)
-            res.addElement(scores[i].value, correctedScores[i]);
+        for (int i = 0; i < scores.length; i++) {
+            //res.addElement(scores[i].value, correctedScores[i]);
+            res.addElement(scores[i].value, scores[i].score);
+
+        }
 
         if (predictionType.equals(NEWord.LabelToLookAt.PredictionLevel1Tagger)) {
             w.neTypeLevel1 = maxLabel;

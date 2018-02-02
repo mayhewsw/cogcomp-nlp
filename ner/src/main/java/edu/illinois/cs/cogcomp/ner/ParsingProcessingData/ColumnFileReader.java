@@ -61,9 +61,12 @@ class ColumnFileReader extends ColumnFormat {
             // don't care.
         }
 
-        if(!line[8].equals("0")){
+        try {
             w.setFreq(Double.parseDouble(line[8]));
+        }catch(NumberFormatException e){
+            // don't need to do anything.
         }
+
 
         if(line.length > 10) {
             w.addWikifierFeatures(Arrays.copyOfRange(line, 10, line.length));
@@ -86,13 +89,19 @@ class ColumnFileReader extends ColumnFormat {
                 // don't care.
             }
 
-            
-            if(!line[7].equals("x")){
-                w.setEntDist(Integer.parseInt(line[7]));
+
+            try{
+                int i = Integer.parseInt(line[7]);
+                w.setEntDist(i);
+            }catch (NumberFormatException e) {
+                // don't care.
             }
 
-            if(!line[8].equals("0")){
+
+            try {
                 w.setFreq(Double.parseDouble(line[8]));
+            }catch(NumberFormatException e){
+                // don't need to do anything.
             }
 
             if(line.length > 10) {
