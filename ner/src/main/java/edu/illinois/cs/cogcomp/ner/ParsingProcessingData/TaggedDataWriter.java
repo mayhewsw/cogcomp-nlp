@@ -180,8 +180,8 @@ public class TaggedDataWriter {
                         weightstring.append(tag + ":" + String.format( "%.2f", score ));
                     }
 
-                    res.append(w.getPrediction(labelType)).append("\t").append(j).append("\t" + w.start + "\t").append(w.end + "\t")
-                            .append("O\t").append(w.form).append("\t" + weightstring).append("\tx\t0\n");
+                    res.append(w.getPrediction(labelType)).append("\t0").append("\t" + j).append("\t" + w.start).append("\t" + w.end)
+                            .append("\t" + w.form).append("\t" + weightstring).append("\tx\t0\n");
                 }
                 res.append("\n");
             }

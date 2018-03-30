@@ -1,8 +1,14 @@
 package edu.illinois.cs.cogcomp.ner.LbjTagger;
 
 import edu.illinois.cs.cogcomp.core.datastructures.Pair;
+import edu.illinois.cs.cogcomp.core.datastructures.ViewNames;
+import edu.illinois.cs.cogcomp.core.datastructures.textannotation.Constituent;
+import edu.illinois.cs.cogcomp.core.datastructures.textannotation.Sentence;
+import edu.illinois.cs.cogcomp.core.datastructures.textannotation.TextAnnotation;
+import edu.illinois.cs.cogcomp.core.datastructures.textannotation.View;
 import edu.illinois.cs.cogcomp.core.io.IOUtils;
 import edu.illinois.cs.cogcomp.core.io.LineIO;
+import edu.illinois.cs.cogcomp.core.utilities.SerializationHelper;
 import edu.illinois.cs.cogcomp.core.utilities.StringUtils;
 import edu.illinois.cs.cogcomp.lbjava.classify.TestDiscrete;
 import edu.illinois.cs.cogcomp.lbjava.learn.*;
@@ -24,19 +30,21 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.soap.Text;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
 /**
- * ACLRunner class. For ACL2016
+ * LORELEIRunner class. For LORELEI 2018
  * Created by mayhew2 on 3/15/16.
  */
 @SuppressWarnings("Duplicates")
 public class LORELEIRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(LORELEIRunner.class);
-    public static final String filesFormat = "-c";
+    public static String filesFormat = "-c";
+    private static boolean dupe = false;
 
     public static String config = null;
 
@@ -46,26 +54,27 @@ public class LORELEIRunner {
         Option help = new Option( "help", "print this message" );
 
         Option configfile = Option.builder("cf")
-                .argName("config")
                 .hasArg()
                 .required()
                 .build();
 
         Option trainpath = Option.builder("train")
-                .argName("path")
                 .hasArg()
                 .build();
 
         Option testpath = Option.builder("test")
-                .argName("path")
                 .hasArg()
                 .required()
                 .build();
 
         Option langopt = Option.builder("lang")
-                .argName("name")
                 .hasArg()
                 .required()
+                .build();
+
+        Option formatopt = Option.builder("format")
+                .hasArg()
+                .desc("Choose between reading conll files and reading from serialized TAs")
                 .build();
 
 
@@ -73,6 +82,8 @@ public class LORELEIRunner {
         options.addOption(trainpath);
         options.addOption(testpath);
         options.addOption(langopt);
+        options.addOption(formatopt);
+
         options.addOption(configfile);
 
         CommandLineParser parser = new DefaultParser();
@@ -96,6 +107,11 @@ public class LORELEIRunner {
                 WordEmbedding.setMonoVecsNew("en");
             else
                 WordEmbedding.loadMultiDBNew(ParametersForLbjCode.currentParameters.testlang);
+        }
+
+        if(cmd.hasOption("format")){
+            filesFormat = cmd.getOptionValue("format");
+            System.out.println(filesFormat);
         }
 
         if(cmd.hasOption("train")){
@@ -127,17 +143,95 @@ public class LORELEIRunner {
      */
     public static Data loaddata(String datapath, String filesFormat, boolean train) throws Exception {
         String[] paths = datapath.split(",");
-        // Get train data
-        String first = paths[0];
-        Data data = new Data(first, first, filesFormat, new String[]{}, new String[]{});
-        for(int i = 1; i < paths.length; i++){
-            data.addFolderToData(paths[i], filesFormat);
+        Data data;
+
+        if (filesFormat.equals("ta")) {
+            List<TextAnnotation> tas = new ArrayList<>();
+            for(String path : paths){
+                File[] files = (new File(path)).listFiles();
+                for(File file : files){
+                    TextAnnotation ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath());
+                    tas.add(ta);
+                }
+            }
+            data = loaddataFromTAs(tas);
+        }else if(filesFormat.equals("-c")) {
+            // Get train data
+            String first = paths[0];
+            data = new Data(first, first, filesFormat, new String[]{}, new String[]{});
+            for (int i = 1; i < paths.length; i++) {
+                data.addFolderToData(paths[i], filesFormat);
+            }
+        }else{
+            throw new IllegalArgumentException("format " + filesFormat + " not recognized");
         }
 
         ExpressiveFeaturesAnnotator.train = train;
         ExpressiveFeaturesAnnotator.annotate(data);
-
         data.setLabelsToIgnore(ParametersForLbjCode.currentParameters.labelsToIgnoreInEvaluation);
+
+        return data;
+    }
+
+    /**
+     * NER Code uses the Data object to run. This converts TextAnnotations into a Data object.
+     * Important: this creates data with BIO labeling.
+     *
+     * @param tas list of text annotations
+     */
+    public static Data loaddataFromTAs(List<TextAnnotation> tas) throws Exception {
+
+        Data data = new Data();
+        for(TextAnnotation ta : tas) {
+            // convert this data structure into one the NER package can deal with.
+            ArrayList<LinkedVector> sentences = new ArrayList<>();
+            String[] tokens = ta.getTokens();
+
+            View ner = ta.getView(ViewNames.NER_CONLL);
+
+            int[] tokenindices = new int[tokens.length];
+            int tokenIndex = 0;
+            int neWordIndex = 0;
+            for (int i = 0; i < ta.getNumberOfSentences(); i++) {
+                Sentence sentence = ta.getSentence(i);
+                int sentstart = sentence.getStartSpan();
+
+                LinkedVector words = new LinkedVector();
+
+                for(int k = 0; k < sentence.size(); k++){
+                    String w = sentence.getToken(k);
+
+                    int tokenid = sentstart+k;
+                    List<Constituent> cons = ner.getConstituentsCoveringToken(tokenid);
+                    if(cons.size() > 1){
+                        logger.error("Too many constituents for token " + tokenid + ", choosing just the first.");
+                    }
+
+                    String tag = "O";
+
+                    if(cons.size() > 0) {
+                        Constituent c = cons.get(0);
+                        if(tokenid == c.getSpan().getFirst())
+                            tag = "B-" + c.getLabel();
+                        else
+                            tag = "I-" + c.getLabel();
+                    }
+
+                    if (w.length() > 0) {
+                        NEWord.addTokenToSentence(words, w, tag);
+                        tokenindices[neWordIndex] = tokenIndex;
+                        neWordIndex++;
+                    } else {
+                        logger.error("Bad (zero length) token.");
+                    }
+                    tokenIndex++;
+                }
+                if (words.size() > 0)
+                    sentences.add(words);
+            }
+            NERDocument doc = new NERDocument(sentences, ta.getId());
+            data.documents.add(doc);
+        }
 
         return data;
     }
@@ -158,7 +252,7 @@ public class LORELEIRunner {
                 NEWord.LabelToLookAt.GoldLabel);
 
         // FIXME: this is where we set the progressOutput var for the BatchTrainer
-        WeightedBatchTrainer bt = new WeightedBatchTrainer(classifier, new DataSetReader(dataSet), 50000);
+        WeightedBatchTrainer bt = new WeightedBatchTrainer(classifier, new DataSetReader(dataSet, dupe), 50000);
 
         classifier.setLexicon(bt.preExtract(exampleStorePath));
 
@@ -247,19 +341,18 @@ public class LORELEIRunner {
         Decoder.annotateDataBIO(testData, tagger1, tagger2);
 
         ArrayList<String> results = new ArrayList<>();
-        results.add("word\tgold\tpred");
         for(NERDocument doc : testData.documents) {
             List<String> docpreds = new ArrayList<>();
 
             ArrayList<LinkedVector> sentences = doc.sentences;
-            results.add(doc.docname);
+            //results.add(doc.docname);
             for (int k = 0; k < sentences.size(); k++){
                 for (int i = 0; i < sentences.get(k).size() ; ++i){
                     NEWord w = (NEWord)sentences.get(k).get(i);
                     if(!w.neLabel.equals(w.neTypeLevel2)) {
-                        results.add("***" + w.form + "\t" + w.neLabel + "\t" + w.neTypeLevel2);
+                        results.add(w.form + " " + w.neLabel + " " + w.neTypeLevel2);
                     }else{
-                        results.add(w.form + "\t" + w.neLabel + "\t" + w.neTypeLevel2);
+                        results.add(w.form + " " + w.neLabel + " " + w.neTypeLevel2);
                     }
                     docpreds.add(ACLRunner.conllline(w.neTypeLevel2, i, w.form));
                 }
@@ -332,10 +425,18 @@ public class LORELEIRunner {
         int sentenceId =0;
         int tokenId=0;
         int generatedSamples = 0;
+        private boolean readytoduplicate = true;
+        private boolean duplicateO = false;
 
         public DataSetReader(Data dataset) {
             this.dataset = dataset;
         }
+
+        public DataSetReader(Data dataset, boolean dupe) {
+            this.dataset = dataset;
+            this.duplicateO = dupe;
+        }
+
 
         public void close() {
             // do nothing
@@ -347,6 +448,18 @@ public class LORELEIRunner {
             }
 
             NEWord res =  (NEWord) dataset.documents.get(docid).sentences.get(sentenceId).get(tokenId);
+
+            if(duplicateO) {
+                if (res.neLabel.equals("O") && readytoduplicate) {
+                    NEWord clone = (NEWord) res.clone();
+                    clone.neLabel = "B-MNT";
+                    clone.weight = 1 - clone.weight;
+                    readytoduplicate = false;
+                    return res;
+                } else {
+                    readytoduplicate = true;
+                }
+            }
 
             if(tokenId < dataset.documents.get(docid).sentences.get(sentenceId).size()-1)
                 tokenId++;

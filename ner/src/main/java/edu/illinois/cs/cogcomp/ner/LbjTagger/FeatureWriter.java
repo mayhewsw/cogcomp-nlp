@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ * This writes output to LIBSVM (libsvm) format features.
+ *
  * ACLRunner class. For ACL2016
  * Created by mayhew2 on 3/15/16.
  */

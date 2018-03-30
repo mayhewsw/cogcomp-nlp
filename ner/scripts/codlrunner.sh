@@ -11,6 +11,10 @@ TRAIN=$1
 INPUT=$2
 OUTPUT=$3
 LANG=$4
+DUPE=$5
+
+
+echo "This is dupe: $DUPE"
 
 OUTF=logs/$LANG-`date +%m-%d-%y-%H%M`-codl.log
 echo "Logging to:" $OUTF
@@ -31,7 +35,7 @@ CONFIG=config/tacl/$LANG.config
 #OUTPUT=/shared/corpora/ner/conll2003/eng/Train-mention
 #OUTPUT=/tmp/
 
-CMD="java -classpath  ${cpath} -Xmx16g edu.illinois.cs.cogcomp.ner.LbjTagger.CODLRunner -train $TRAIN -input $INPUT -output $OUTPUT -cf $CONFIG -lang $LANG"
+CMD="java -classpath  ${cpath} -Xmx16g edu.illinois.cs.cogcomp.ner.LbjTagger.CODLRunner -train $TRAIN -input $INPUT -output $OUTPUT -cf $CONFIG -lang $LANG $DUPE"
 
 alias s="tail -f ${OUTF}"
 
@@ -41,6 +45,6 @@ datastats.py $TRAIN >> $OUTF
 ls $TRAIN >> $OUTF
 
 
-echo "$0: running command '$CMD'..." >> $OUTF
+echo "$0: running command '$CMD'..."
 
 ${CMD} >> $OUTF

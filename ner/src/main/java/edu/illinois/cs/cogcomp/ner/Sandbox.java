@@ -1,11 +1,15 @@
 package edu.illinois.cs.cogcomp.ner;
 
 import edu.illinois.cs.cogcomp.core.datastructures.Pair;
+import edu.illinois.cs.cogcomp.core.datastructures.textannotation.TextAnnotation;
 import edu.illinois.cs.cogcomp.core.io.LineIO;
+import edu.illinois.cs.cogcomp.core.utilities.SerializationHelper;
 import edu.illinois.cs.cogcomp.lbjava.learn.Lexicon;
 import edu.illinois.cs.cogcomp.lbjava.learn.SparseNetworkLearner;
+import edu.illinois.cs.cogcomp.nlp.corpusreaders.CoNLLNerReader;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.xml.soap.Text;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -227,33 +231,40 @@ public class Sandbox {
 //        //String model = "models/trans-ug/mono";
 //
 
-        List<String> lines = LineIO.read("ner/data.test");
-        for(String line: lines){
-            String[] terms = line.split("\\s+");
+//        List<String> lines = LineIO.read("ner/data.test");
+//        for(String line: lines){
+//            String[] terms = line.split("\\s+");
+//
+//            String classStr = terms[0];
+//            // In SVMLight +1 and 1 are the same label.
+//            // Adding a special case to normalize...
+//            if (classStr.equals("+1")) {
+//                classStr = "1";
+//            }
+//
+//
+//            // the rest are feature-value pairs
+//            ArrayList<Integer> indices = new ArrayList<Integer>();
+//            ArrayList<Double> values = new ArrayList<Double>();
+//            for (int termIndex = 1; termIndex < terms.length; termIndex++) {
+//                if (!terms[termIndex].equals("")) {
+//                    String[] s = terms[termIndex].split(":");
+//                    if (s.length != 2) {
+//                        System.out.println(line);
+//
+//                        throw new RuntimeException("invalid format: " + terms[termIndex] + " (should be feature:value)");
+//                    }
+//                    String feature = s[0];
+//                }
+//            }
+//        }
 
-            String classStr = terms[0];
-            // In SVMLight +1 and 1 are the same label.
-            // Adding a special case to normalize...
-            if (classStr.equals("+1")) {
-                classStr = "1";
-            }
-
-
-            // the rest are feature-value pairs
-            ArrayList<Integer> indices = new ArrayList<Integer>();
-            ArrayList<Double> values = new ArrayList<Double>();
-            for (int termIndex = 1; termIndex < terms.length; termIndex++) {
-                if (!terms[termIndex].equals("")) {
-                    String[] s = terms[termIndex].split(":");
-                    if (s.length != 2) {
-                        System.out.println(line);
-
-                        throw new RuntimeException("invalid format: " + terms[termIndex] + " (should be feature:value)");
-                    }
-                    String feature = s[0];
-                }
-            }
+        CoNLLNerReader cnr = new CoNLLNerReader("/shared/corpora/ner/lorelei/tr/Test/");
+        while(cnr.hasNext()){
+            TextAnnotation ta = cnr.next();
+            SerializationHelper.serializeTextAnnotationToFile(ta, "/tmp/tas/tr/Test/" + ta.getId(), true);
         }
+
 
 //        dd();
 //        System.exit(-1);

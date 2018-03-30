@@ -33,6 +33,7 @@ public class CODLRunner {
     public static final String filesFormat = "-c";
 
     public static String config = null;
+    private static boolean dupe = false;
 
     public static void main(String[] args) throws Exception {
 
@@ -68,18 +69,28 @@ public class CODLRunner {
                 .required()
                 .build();
 
+        Option dupeopt = Option.builder("dupe")
+                .argName("dupe")
+                .build();
+
         options.addOption(help);
         options.addOption(trainpath);
         options.addOption(inputpath);
         options.addOption(outputpath);
         options.addOption(langopt);
         options.addOption(configfile);
+        options.addOption(dupeopt);
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
         if(cmd.hasOption("cf")){
             config = cmd.getOptionValue("cf");
+        }
+
+        if(cmd.hasOption("dupe")){
+            logger.info("Will duplicate Os");
+            dupe = true;
         }
 
         boolean areWeTraining = cmd.hasOption("train");
@@ -147,7 +158,7 @@ public class CODLRunner {
                 NEWord.LabelToLookAt.GoldLabel);
 
         // FIXME: this is where we set the progressOutput var for the BatchTrainer
-        WeightedBatchTrainer bt = new WeightedBatchTrainer(classifier, new DataSetReader(dataSet), 50000);
+        WeightedBatchTrainer bt = new WeightedBatchTrainer(classifier, new DataSetReader(dataSet, dupe), 50000);
 
         classifier.setLexicon(bt.preExtract(exampleStorePath));
 
@@ -246,14 +257,22 @@ public class CODLRunner {
     }
 
     public static class DataSetReader extends WeightedParser {
+        private boolean duplicateO = false;
         public Data dataset = null;
         int docid = 0;
         int sentenceId =0;
         int tokenId=0;
         int generatedSamples = 0;
+        private boolean readytoduplicate = true;
 
         public DataSetReader(Data dataset) {
             this.dataset = dataset;
+        }
+
+
+        public DataSetReader(Data dataset, boolean dupe) {
+            this.dataset = dataset;
+            this.duplicateO = dupe;
         }
 
         public void close() {
@@ -266,6 +285,18 @@ public class CODLRunner {
             }
 
             NEWord res =  (NEWord) dataset.documents.get(docid).sentences.get(sentenceId).get(tokenId);
+
+            if(duplicateO) {
+                if (res.neLabel.equals("O") && readytoduplicate) {
+                    NEWord clone = (NEWord) res.clone();
+                    clone.neLabel = "B-MNT";
+                    clone.weight = 1 - clone.weight;
+                    readytoduplicate = false;
+                    return res;
+                } else {
+                    readytoduplicate = true;
+                }
+            }
 
             if(tokenId < dataset.documents.get(docid).sentences.get(sentenceId).size()-1)
                 tokenId++;
@@ -292,3 +323,7 @@ public class CODLRunner {
 
 
 }
+
+
+
+
