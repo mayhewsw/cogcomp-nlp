@@ -2,10 +2,7 @@ package edu.illinois.cs.cogcomp.ner.LbjTagger;
 
 import edu.illinois.cs.cogcomp.core.datastructures.Pair;
 import edu.illinois.cs.cogcomp.core.datastructures.ViewNames;
-import edu.illinois.cs.cogcomp.core.datastructures.textannotation.Constituent;
-import edu.illinois.cs.cogcomp.core.datastructures.textannotation.Sentence;
-import edu.illinois.cs.cogcomp.core.datastructures.textannotation.TextAnnotation;
-import edu.illinois.cs.cogcomp.core.datastructures.textannotation.View;
+import edu.illinois.cs.cogcomp.core.datastructures.textannotation.*;
 import edu.illinois.cs.cogcomp.core.io.IOUtils;
 import edu.illinois.cs.cogcomp.core.io.LineIO;
 import edu.illinois.cs.cogcomp.core.utilities.SerializationHelper;
@@ -44,7 +41,6 @@ public class LORELEIRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(LORELEIRunner.class);
     public static String filesFormat = "-c";
-    private static boolean dupe = false;
 
     public static String config = null;
 
@@ -127,7 +123,7 @@ public class LORELEIRunner {
             String testroot = cmd.getOptionValue("test");
             String lang = cmd.getOptionValue("lang");
             Data testData = loaddata(testroot, filesFormat, false);
-            Pair<Double, Double> levels  = RunTest(testData, modelpath, lang);
+            Pair<Double, Double> levels  = RunTest(testData, modelpath, lang, testroot);
             System.out.println("Tested on: " + testroot);
         }
 
@@ -150,7 +146,7 @@ public class LORELEIRunner {
             for(String path : paths){
                 File[] files = (new File(path)).listFiles();
                 for(File file : files){
-                    TextAnnotation ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath());
+                    TextAnnotation ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
                     tas.add(ta);
                 }
             }
@@ -237,6 +233,81 @@ public class LORELEIRunner {
     }
 
     /**
+     * Assume data is annotated at this point. This will add an NER view to the TAs.
+     * @param data
+     * @param tas
+     */
+    public static void Data2TextAnnotation(Data data, List<TextAnnotation> tas) {
+
+        HashMap<String, TextAnnotation> id2ta = new HashMap<>();
+        for(TextAnnotation ta : tas){
+            id2ta.put(ta.getId(), ta);
+        }
+
+        for(NERDocument doc : data.documents) {
+            String docid = doc.docname;
+
+            TextAnnotation ta = id2ta.get(docid);
+
+            ArrayList<LinkedVector> nerSentences = doc.sentences;
+            SpanLabelView nerView = new SpanLabelView(ViewNames.NER_CONLL, ta);
+
+            // each LinkedVector in data corresponds to a sentence.
+            int tokenoffset = 0;
+            for (LinkedVector sentence : nerSentences) {
+                boolean open = false;
+
+                // there should be a 1:1 mapping btw sentence tokens in record and words/predictions
+                // from NER.
+                int startIndex = -1;
+                String label = null;
+                for (int j = 0; j < sentence.size(); j++, tokenoffset++) {
+                    NEWord neWord = (NEWord) (sentence.get(j));
+                    String prediction = neWord.neTypeLevel2;
+
+                    // LAM-tlr this is not a great way to ascertain the entity type, it's a bit
+                    // convoluted, and very
+                    // inefficient, use enums, or nominalized indexes for this sort of thing.
+                    if (prediction.startsWith("B-")) {
+                        startIndex = tokenoffset;
+                        label = prediction.substring(2);
+                        open = true;
+                    } else if (j > 0) {
+                        String previous_prediction = ((NEWord) sentence.get(j - 1)).neTypeLevel2;
+                        if (prediction.startsWith("I-")
+                                && (!previous_prediction.endsWith(prediction.substring(2)))) {
+                            startIndex = tokenoffset;
+                            label = prediction.substring(2);
+                            open = true;
+                        }
+                    }
+
+                    if (open) {
+                        boolean close = false;
+                        if (j == sentence.size() - 1) {
+                            close = true;
+                        } else {
+                            String next_prediction = ((NEWord) sentence.get(j + 1)).neTypeLevel2;
+                            if (next_prediction.startsWith("B-"))
+                                close = true;
+                            if (next_prediction.equals("O"))
+                                close = true;
+                            if (next_prediction.indexOf('-') > -1
+                                    && (!prediction.endsWith(next_prediction.substring(2))))
+                                close = true;
+                        }
+                        if (close) {
+                            nerView.addSpanLabel(startIndex, tokenoffset+1, label, 1d);
+                            open = false;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
      * @param classifier
      * @param dataSet
      * @param exampleStorePath
@@ -252,7 +323,7 @@ public class LORELEIRunner {
                 NEWord.LabelToLookAt.GoldLabel);
 
         // FIXME: this is where we set the progressOutput var for the BatchTrainer
-        WeightedBatchTrainer bt = new WeightedBatchTrainer(classifier, new DataSetReader(dataSet, dupe), 50000);
+        WeightedBatchTrainer bt = new WeightedBatchTrainer(classifier, new DataSetReader(dataSet), 50000);
 
         classifier.setLexicon(bt.preExtract(exampleStorePath));
 
@@ -333,7 +404,7 @@ public class LORELEIRunner {
         tagger2.save();
     }
 
-    public static Pair<Double, Double> RunTest(Data testData, String modelPath, String testlang) throws Exception {
+    public static Pair<Double, Double> RunTest(Data testData, String modelPath, String testlang, String datapath) throws Exception {
 
         NETaggerLevel1 tagger1 = new NETaggerLevel1(modelPath + ".level1", modelPath + ".level1.lex");
         NETaggerLevel2 tagger2 = new NETaggerLevel2(modelPath + ".level2", modelPath + ".level2.lex");
@@ -363,6 +434,29 @@ public class LORELEIRunner {
             //LineIO.write("/shared/corpora/ner/system-outputs/"+testlang+"/projection-fa/" + doc.docname, docpreds);
         }
         //logger.info("Just wrote to: " + "/shared/corpora/ner/system-outputs/"+testlang+ "/projection-fa/");
+
+
+        String[] paths = datapath.split(",");
+        List<TextAnnotation> tas = new ArrayList<>();
+        for(String path : paths){
+            File[] files = (new File(path)).listFiles();
+            for(File file : files){
+                TextAnnotation ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
+                tas.add(ta);
+            }
+        }
+        Data2TextAnnotation(testData, tas);
+
+        List<String> tablines = new ArrayList<>();
+        for(TextAnnotation ta : tas){
+            View ner = ta.getView(ViewNames.NER_CONLL);
+            for(Constituent c : ner.getConstituents()){
+
+                String menid = ta.getId() + ":" + c.getStartCharOffset() + "-" + c.getEndSpan();
+                String line = String.format("Penn\t%s\t%s\t%s\tNULL\t%s\tNAM\t1.0\n",ta.getId(),c.getTokenizedSurfaceForm(),menid,c.getLabel());
+                tablines.add(line);
+            }
+        }
 
 
         String outdatapath = modelPath + ".testdata";
@@ -425,18 +519,10 @@ public class LORELEIRunner {
         int sentenceId =0;
         int tokenId=0;
         int generatedSamples = 0;
-        private boolean readytoduplicate = true;
-        private boolean duplicateO = false;
 
         public DataSetReader(Data dataset) {
             this.dataset = dataset;
         }
-
-        public DataSetReader(Data dataset, boolean dupe) {
-            this.dataset = dataset;
-            this.duplicateO = dupe;
-        }
-
 
         public void close() {
             // do nothing
@@ -448,18 +534,6 @@ public class LORELEIRunner {
             }
 
             NEWord res =  (NEWord) dataset.documents.get(docid).sentences.get(sentenceId).get(tokenId);
-
-            if(duplicateO) {
-                if (res.neLabel.equals("O") && readytoduplicate) {
-                    NEWord clone = (NEWord) res.clone();
-                    clone.neLabel = "B-MNT";
-                    clone.weight = 1 - clone.weight;
-                    readytoduplicate = false;
-                    return res;
-                } else {
-                    readytoduplicate = true;
-                }
-            }
 
             if(tokenId < dataset.documents.get(docid).sentences.get(sentenceId).size()-1)
                 tokenId++;

@@ -36,11 +36,11 @@ CONFIG=config/tacl/$LANG.config
 #TRAIN=/shared/corpora/ner/conll2003/deu/Train
 #TRAIN=/shared/corpora/ner/lorelei/om/Train
 #TRAIN=/shared/corpora/ner/eval/column/Train-weighted
-TRAIN=/home/mayhew/data/CALCS2018/CALCS_ENG_SPA/Train
-
+#TRAIN=/home/mayhew/data/CALCS2018/CALCS_ENG_SPA/Train
+TRAIN=/shared/corpora/corporaWeb/lorelei/evaluation-20170804/il5/set0/data/monolingual_text/json-annotation-stephen/
 
 #TEST=/shared/corpora/ner/lorelei/$LANG/Train-0.25-weighted
-TEST=/shared/corpora/ner/lorelei/om/Test
+#TEST=/shared/corpora/ner/lorelei/om/Test
 #TEST=/shared/corpora/ner/conll2003/eng/Train-0.25-mention
 #TEST=/shared/corpora/ner/conll2003/deu/Test
 #TEST=/shared/corpora/ner/conll2002/esp/Test
@@ -48,9 +48,12 @@ TEST=/shared/corpora/ner/lorelei/om/Test
 #TEST=/shared/corpora/ner/conll2003/eng/Dev-mention
 #TEST=/home/mayhew/data/broad_twitter_corpus/setH2
 #TEST=/shared/corpora/ner/lorelei/ug/All-stem-best
-TEST=/home/mayhew/data/CALCS2018/CALCS_ENG_SPA/Dev
+#TEST=/home/mayhew/data/CALCS2018/CALCS_ENG_SPA/Dev
+TEST=/shared/corpora/corporaWeb/lorelei/evaluation-20170804/il5/setE/data/monolingual_text/json/
 
-CMD="java -classpath  ${cpath} -Xmx16g edu.illinois.cs.cogcomp.ner.LbjTagger.LORELEIRunner -train $TRAIN -test $TEST -cf $CONFIG -lang $LANG"
+
+
+CMD="java -classpath  ${cpath} -Xmx16g edu.illinois.cs.cogcomp.ner.LbjTagger.LORELEIRunner -train $TRAIN -test $TEST -cf $CONFIG -lang $LANG -format ta"
 
 
 #echo $TRAIN

@@ -10,6 +10,7 @@
  */
 package edu.illinois.cs.cogcomp.ner;
 
+import edu.illinois.cs.cogcomp.core.resources.ResourceConfigurator;
 import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.ExpressiveFeaturesAnnotator;
 import edu.illinois.cs.cogcomp.ner.InferenceMethods.Decoder;
 import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel1;
@@ -24,16 +25,21 @@ import edu.illinois.cs.cogcomp.core.datastructures.textannotation.SpanLabelView;
 import edu.illinois.cs.cogcomp.core.datastructures.textannotation.TextAnnotation;
 import edu.illinois.cs.cogcomp.core.utilities.configuration.ResourceManager;
 import edu.illinois.cs.cogcomp.lbjava.parse.LinkedVector;
+import io.minio.errors.InvalidEndpointException;
+import io.minio.errors.InvalidPortException;
+import org.cogcomp.Datastore;
+import org.cogcomp.DatastoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 
 /**
  * Generate NER annotations using the Annotator API.
- * 
+ *
  * @author redman
  */
 public class NERAnnotator extends Annotator {
@@ -96,6 +102,56 @@ public class NERAnnotator extends Annotator {
         }
         this.t1 = tagger1;
         this.t2 = tagger2;
+    }
+
+    /**
+     * Superclass calls this method either on instantiation or at first call to getView(). Logging
+     * has been disabled because non-static logger is not initialized at the time this is called if
+     * non-lazy initialization is specified.
+     *
+     * @param nerRm configuration parameters passed to constructor
+     */
+    @Override
+    public void initialize(ResourceManager nerRm) {
+        if (ViewNames.NER_ONTONOTES.equals(getViewName()))
+            nerRm = new NerOntonotesConfigurator().getConfig(nerRm);
+        else
+            nerRm = new NerBaseConfigurator().getConfig(nerRm);
+
+        ParametersForLbjCode.currentParameters.forceNewSentenceOnLineBreaks = false;
+        Parameters.readConfigAndLoadExternalData(nerRm);
+
+        String dataset;
+        if(viewName.toLowerCase().contains("conll")) {
+            dataset = "enron-conll";
+        }
+        else {
+            dataset = "ontonotes";
+        }
+
+        String data_split = nerRm.getString(NerBaseConfigurator.TRAINED_ON);
+
+        try {
+            Datastore ds = new Datastore(new ResourceConfigurator().getConfig(nerRm));
+            String artifact_id = "ner-model-" + dataset + "-" + data_split;
+            File modelDir = ds.getDirectory("edu.illinois.cs.cogcomp.ner", artifact_id, 4.0, false);
+            String model = "";
+            if(modelDir.getPath().contains("conll")) {
+                model = modelDir.getPath() + "/model/EnronCoNLL.model";
+            }
+            else {
+                model = modelDir.getPath() + "/model/OntoNotes.model";
+            }
+            NETaggerLevel1 tagger1 = new NETaggerLevel1(model + ".level1", model + ".level1.lex");
+            NETaggerLevel2 tagger2 = null;
+            if (ParametersForLbjCode.currentParameters.featuresToUse.containsKey("PredictionsLevel1")) {
+                tagger2 = new NETaggerLevel2(model + ".level2", model + ".level2.lex");
+            }
+            this.t1 = tagger1;
+            this.t2 = tagger2;
+        } catch (InvalidPortException | DatastoreException | InvalidEndpointException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
