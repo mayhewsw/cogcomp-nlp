@@ -31,6 +31,7 @@ import javax.xml.soap.Text;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * LORELEIRunner class. For LORELEI 2018
@@ -468,10 +469,14 @@ public class LORELEIRunner {
         for(TextAnnotation ta : tas){
             if(ta.hasView(ViewNames.NER_CONLL)) {
                 View ner = ta.getView(ViewNames.NER_CONLL);
+                View roman = ta.getView(ViewNames.TRANSLITERATION);
                 for (Constituent c : ner.getConstituents()) {
+                    List<Constituent> romantoks = roman.getConstituentsCoveringSpan(c.getStartSpan(), c.getEndSpan());
+                    List<String> toks = romantoks.stream().map(Constituent::getLabel).collect(Collectors.toList());
+                    String romanstring = StringUtils.join(" ", toks);
 
                     String menid = ta.getId() + ":" + c.getStartCharOffset() + "-" + (c.getEndCharOffset()-1);
-                    String line = String.format("Penn\t%s\t%s\t%s\tNULL\t%s\tNAM\t1.0", ta.getId(), c.getTokenizedSurfaceForm(), menid, c.getLabel());
+                    String line = String.format("Penn\t%s\t%s\t%s\tNULL\t%s\tNAM\t1.0", ta.getId(), romanstring, menid, c.getLabel());
                     tablines.add(line);
                 }
             }
