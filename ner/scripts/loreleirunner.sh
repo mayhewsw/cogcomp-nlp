@@ -1,6 +1,3 @@
-
-a
-
 #!/bin/sh
 # generate/update the binary files and dependencies
 

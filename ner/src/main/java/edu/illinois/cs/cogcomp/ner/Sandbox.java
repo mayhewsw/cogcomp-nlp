@@ -259,12 +259,6 @@ public class Sandbox {
 //            }
 //        }
 
-        CoNLLNerReader cnr = new CoNLLNerReader("/shared/corpora/ner/lorelei/tr/Test/");
-        while(cnr.hasNext()){
-            TextAnnotation ta = cnr.next();
-            SerializationHelper.serializeTextAnnotationToFile(ta, "/tmp/tas/tr/Test/" + ta.getId(), true);
-        }
-
 
 //        dd();
 //        System.exit(-1);

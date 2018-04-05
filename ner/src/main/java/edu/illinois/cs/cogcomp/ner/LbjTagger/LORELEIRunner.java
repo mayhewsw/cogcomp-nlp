@@ -146,8 +146,14 @@ public class LORELEIRunner {
             for(String path : paths){
                 File[] files = (new File(path)).listFiles();
                 for(File file : files){
-                    TextAnnotation ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
-                    tas.add(ta);
+
+                    try {
+                        TextAnnotation ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
+                        tas.add(ta);
+                    }catch(IllegalArgumentException e){
+                        System.out.println("Skipping: " + file);
+                    }
+
                 }
             }
             data = loaddataFromTAs(tas);
@@ -183,7 +189,13 @@ public class LORELEIRunner {
             ArrayList<LinkedVector> sentences = new ArrayList<>();
             String[] tokens = ta.getTokens();
 
-            View ner = ta.getView(ViewNames.NER_CONLL);
+            View ner;
+            if(ta.hasView(ViewNames.NER_CONLL)){
+                ner = ta.getView(ViewNames.NER_CONLL);
+            }else{
+                ner = new View(ViewNames.NER_CONLL, "Ltf2TextAnnotation",ta,1.0);
+                ta.addView(ViewNames.NER_CONLL, ner);
+            }
 
             int[] tokenindices = new int[tokens.length];
             int tokenIndex = 0;
@@ -303,6 +315,7 @@ public class LORELEIRunner {
                     }
                 }
             }
+            ta.addView(ViewNames.NER_CONLL, nerView);
         }
     }
 
@@ -441,22 +454,29 @@ public class LORELEIRunner {
         for(String path : paths){
             File[] files = (new File(path)).listFiles();
             for(File file : files){
-                TextAnnotation ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
-                tas.add(ta);
+                try {
+                    TextAnnotation ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
+                    tas.add(ta);
+                }catch(IllegalArgumentException e){
+                    System.out.println("Skipping: " + file);
+                }
             }
         }
         Data2TextAnnotation(testData, tas);
 
         List<String> tablines = new ArrayList<>();
         for(TextAnnotation ta : tas){
-            View ner = ta.getView(ViewNames.NER_CONLL);
-            for(Constituent c : ner.getConstituents()){
+            if(ta.hasView(ViewNames.NER_CONLL)) {
+                View ner = ta.getView(ViewNames.NER_CONLL);
+                for (Constituent c : ner.getConstituents()) {
 
-                String menid = ta.getId() + ":" + c.getStartCharOffset() + "-" + c.getEndSpan();
-                String line = String.format("Penn\t%s\t%s\t%s\tNULL\t%s\tNAM\t1.0\n",ta.getId(),c.getTokenizedSurfaceForm(),menid,c.getLabel());
-                tablines.add(line);
+                    String menid = ta.getId() + ":" + c.getStartCharOffset() + "-" + (c.getEndCharOffset()-1);
+                    String line = String.format("Penn\t%s\t%s\t%s\tNULL\t%s\tNAM\t1.0", ta.getId(), c.getTokenizedSurfaceForm(), menid, c.getLabel());
+                    tablines.add(line);
+                }
             }
         }
+        LineIO.write("tabresults", tablines);
 
 
         String outdatapath = modelPath + ".testdata";
