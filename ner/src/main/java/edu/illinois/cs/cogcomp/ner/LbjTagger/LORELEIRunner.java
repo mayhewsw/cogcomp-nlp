@@ -198,6 +198,11 @@ public class LORELEIRunner {
                 ta.addView(ViewNames.NER_CONLL, ner);
             }
 
+            View lemma = null;
+            if(ta.hasView(ViewNames.LEMMA)){
+                lemma = ta.getView(ViewNames.LEMMA);
+            }
+
             int[] tokenindices = new int[tokens.length];
             int tokenIndex = 0;
             int neWordIndex = 0;
@@ -208,9 +213,17 @@ public class LORELEIRunner {
                 LinkedVector words = new LinkedVector();
 
                 for(int k = 0; k < sentence.size(); k++){
-                    String w = sentence.getToken(k);
-
                     int tokenid = sentstart+k;
+                    
+                    String w = sentence.getToken(k);
+                    if(lemma != null){
+                        List<Constituent> lemmacons = lemma.getConstituentsCoveringToken(tokenid);
+                        if(lemmacons.size() > 0) {
+                            Constituent lemmacon = lemmacons.get(0);
+                            w = lemmacon.getLabel();
+                        }
+                    }
+
                     List<Constituent> cons = ner.getConstituentsCoveringToken(tokenid);
                     if(cons.size() > 1){
                         logger.error("Too many constituents for token " + tokenid + ", choosing just the first.");
@@ -261,7 +274,6 @@ public class LORELEIRunner {
             String docid = doc.docname;
 
             TextAnnotation ta = id2ta.get(docid);
-
             ArrayList<LinkedVector> nerSentences = doc.sentences;
             SpanLabelView nerView = new SpanLabelView(ViewNames.NER_CONLL, ta);
 
