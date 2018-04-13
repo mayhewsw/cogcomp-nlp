@@ -36,6 +36,7 @@ CONFIG=config/tacl/$LANG.config
 #TRAIN=/home/mayhew/data/CALCS2018/CALCS_ENG_SPA/Train
 TRAIN=/shared/corpora/ner/lorelei/so/new/Train/
 
+
 #TEST=/shared/corpora/ner/lorelei/$LANG/Train-0.25-weighted
 #TEST=/shared/corpora/ner/lorelei/om/Test
 #TEST=/shared/corpora/ner/conll2003/eng/Train-0.25-mention
