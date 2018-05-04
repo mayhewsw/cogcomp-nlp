@@ -34,7 +34,9 @@ CONFIG=config/tacl/$LANG.config
 #TRAIN=/shared/corpora/ner/lorelei/om/Train
 #TRAIN=/shared/corpora/ner/eval/column/Train-weighted
 #TRAIN=/home/mayhew/data/CALCS2018/CALCS_ENG_SPA/Train
-TRAIN=/shared/corpora/ner/lorelei-swm-new/am/Train
+#TRAIN=/shared/corpora/ner/lorelei-swm-new/yo/Train
+#TRAIN=/shared/corpora/corporaWeb/lorelei/evaluation-upenn-20180402/processed/il5/train/reflex-json,/shared/corpora/corporaWeb/lorelei/evaluation-upenn-20180402/processed/il5/train/set1-twitter
+TRAIN=/shared/corpora/corporaWeb/lorelei/evaluation-upenn-20180402/processed/il6/train/alltrain-json
 
 #TEST=/shared/corpora/ner/lorelei/$LANG/Train-0.25-weighted
 #TEST=/shared/corpora/ner/lorelei/om/Test
@@ -46,7 +48,7 @@ TRAIN=/shared/corpora/ner/lorelei-swm-new/am/Train
 #TEST=/home/mayhew/data/broad_twitter_corpus/setH2
 #TEST=/shared/corpora/ner/lorelei/ug/All-stem-best
 #TEST=/home/mayhew/data/CALCS2018/CALCS_ENG_SPA/Dev
-TEST=/shared/corpora/ner/lorelei-swm-new/am/Test
+TEST=/shared/corpora/ner/lorelei-swm-new/orm/All-json/
 
 
 CMD="java -classpath  ${cpath} -Xmx16g edu.illinois.cs.cogcomp.ner.LbjTagger.LORELEIRunner -train $TRAIN -test $TEST -cf $CONFIG -lang $LANG -format ta"
