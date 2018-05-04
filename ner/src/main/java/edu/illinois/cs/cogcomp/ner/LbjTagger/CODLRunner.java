@@ -104,7 +104,7 @@ public class CODLRunner {
         if(cmd.hasOption("train")){
             int trainiter = 30;
             String trainroot = cmd.getOptionValue("train");
-            Data trainData = loaddata(trainroot, filesFormat, true);
+            Data trainData = LORELEIRunner.loaddata(trainroot, filesFormat, true);
             RunTraining(trainData, trainiter, modelpath);
             System.out.println("Trained on: " + trainroot);
         }
@@ -112,35 +112,35 @@ public class CODLRunner {
         // should be always... it's required.
 
         String testroot = cmd.getOptionValue("input");
-        Data testData = loaddata(testroot, filesFormat, false);
+        Data testData = LORELEIRunner.loaddata(testroot, filesFormat, false);
         WriteOutput(testData, modelpath, cmd.getOptionValue("output"));
     }
 
-    /**
-     * Given a path to a folder, load the data from that folder. Assume the string is a comma
-     * separated list, perhaps of length one.
-     * @param datapath
-     * @param filesFormat
-     * @return
-     * @throws Exception
-     */
-    public static Data loaddata(String datapath, String filesFormat, boolean train) throws Exception {
-        // this used to be a comma, but I changed it...
-        String[] paths = datapath.split("@@@@@");
-        // Get train data
-        String first = paths[0];
-        Data data = new Data(first, first, filesFormat, new String[]{}, new String[]{});
-        for(int i = 1; i < paths.length; i++){
-            data.addFolderToData(paths[i], filesFormat);
-        }
-
-        ExpressiveFeaturesAnnotator.train = train;
-        ExpressiveFeaturesAnnotator.annotate(data);
-
-        data.setLabelsToIgnore(ParametersForLbjCode.currentParameters.labelsToIgnoreInEvaluation);
-
-        return data;
-    }
+//    /**
+//     * Given a path to a folder, load the data from that folder. Assume the string is a comma
+//     * separated list, perhaps of length one.
+//     * @param datapath
+//     * @param filesFormat
+//     * @return
+//     * @throws Exception
+//     */
+//    public static Data loaddata(String datapath, String filesFormat, boolean train) throws Exception {
+//        // this used to be a comma, but I changed it...
+//        String[] paths = datapath.split("@@@@@");
+//        // Get train data
+//        String first = paths[0];
+//        Data data = new Data(first, first, filesFormat, new String[]{}, new String[]{});
+//        for(int i = 1; i < paths.length; i++){
+//            data.addFolderToData(paths[i], filesFormat);
+//        }
+//
+//        ExpressiveFeaturesAnnotator.train = train;
+//        ExpressiveFeaturesAnnotator.annotate(data);
+//
+//        data.setLabelsToIgnore(ParametersForLbjCode.currentParameters.labelsToIgnoreInEvaluation);
+//
+//        return data;
+//    }
 
     /**
      * @param classifier
@@ -158,7 +158,7 @@ public class CODLRunner {
                 NEWord.LabelToLookAt.GoldLabel);
 
         // FIXME: this is where we set the progressOutput var for the BatchTrainer
-        WeightedBatchTrainer bt = new WeightedBatchTrainer(classifier, new DataSetReader(dataSet, dupe), 50000);
+        WeightedBatchTrainer bt = new WeightedBatchTrainer(classifier, new DataSetReader(dataSet, dupe), 0);
 
         classifier.setLexicon(bt.preExtract(exampleStorePath));
 
@@ -226,6 +226,9 @@ public class CODLRunner {
 
         Decoder.annotateDataBIO(testData, tagger1, null);
     }
+
+
+
 
     /**
      * Outdatapath can be either a file or a folder.
