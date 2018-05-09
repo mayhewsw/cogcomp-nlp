@@ -1,5 +1,6 @@
 package edu.illinois.cs.cogcomp.ner.LbjTagger;
 
+import com.google.gson.JsonSyntaxException;
 import edu.illinois.cs.cogcomp.core.datastructures.Pair;
 import edu.illinois.cs.cogcomp.core.datastructures.ViewNames;
 import edu.illinois.cs.cogcomp.core.datastructures.textannotation.*;
@@ -24,6 +25,7 @@ import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.TaggedDataWriter;
 import edu.illinois.cs.cogcomp.ner.WordEmbedding;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.SerializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,11 +150,20 @@ public class LORELEIRunner {
                 File[] files = (new File(path)).listFiles();
                 for(File file : files){
                     System.out.println(file.getPath());
+                    TextAnnotation ta = null;
+                    boolean fileread = false;
                     try {
-                        TextAnnotation ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
+                        ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
+                    }catch (JsonSyntaxException e) { }
+
+                    try {
+                        ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath());
+                    }catch (SerializationException e){ }
+
+                    if(ta != null){
                         tas.add(ta);
-                    }catch(IllegalArgumentException e){
-                        System.out.println("Skipping: " + file);
+                    }else{
+                        System.out.println("Skipping: " + file.getPath());
                     }
 
                 }
