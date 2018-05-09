@@ -43,27 +43,27 @@ class ColumnFileReader extends ColumnFormat {
         NEWord w;
         try {
             w = new NEWord(new Word(line[5], line[4], Integer.parseInt(line[2]), Integer.parseInt(line[3])), null, line[0]);
-        }catch(NumberFormatException e ){
+        }catch(Exception e ){
             w = new NEWord(new Word(line[5], line[4]), null, line[0]);
         }
 
         try{
             double d = Double.parseDouble(line[6]);
             w.setWeight(d);
-        }catch (NumberFormatException e) {
+        }catch (Exception e) {
             // don't care.
         }
 
         try{
             int i = Integer.parseInt(line[7]);
             w.setEntDist(i);
-        }catch (NumberFormatException e) {
+        }catch (Exception e) {
             // don't care.
         }
 
         try {
             w.setFreq(Double.parseDouble(line[8]));
-        }catch(NumberFormatException e){
+        }catch(Exception e){
             // don't need to do anything.
         }
 
@@ -78,14 +78,14 @@ class ColumnFileReader extends ColumnFormat {
                 (String[]) super.next()) {
             try {
                 w = new NEWord(new Word(line[5], line[4], Integer.parseInt(line[2]), Integer.parseInt(line[3])), null, line[0]);
-            }catch(NumberFormatException e ){
+            }catch(Exception e ){
                 w = new NEWord(new Word(line[5], line[4]), null, line[0]);
             }
 
             try{
                 double d = Double.parseDouble(line[6]);
                 w.setWeight(d);
-            }catch (NumberFormatException e) {
+            }catch (Exception e) {
                 // don't care.
             }
 
@@ -93,14 +93,14 @@ class ColumnFileReader extends ColumnFormat {
             try{
                 int i = Integer.parseInt(line[7]);
                 w.setEntDist(i);
-            }catch (NumberFormatException e) {
+            }catch (Exception e) {
                 // don't care.
             }
 
 
             try {
                 w.setFreq(Double.parseDouble(line[8]));
-            }catch(NumberFormatException e){
+            }catch(Exception e){
                 // don't need to do anything.
             }
 
