@@ -153,11 +153,11 @@ public class LORELEIRunner {
                     boolean fileread = false;
                     try {
                         ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
-                    }catch (JsonSyntaxException e) { }
+                    }catch (Exception e) { }
 
                     try {
                         ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath());
-                    }catch (SerializationException e){ }
+                    }catch (Exception e){ }
 
                     if(ta != null){
                         tas.add(ta);
