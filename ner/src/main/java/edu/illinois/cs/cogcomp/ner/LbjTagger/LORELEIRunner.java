@@ -149,6 +149,7 @@ public class LORELEIRunner {
             for(String path : paths){
                 File[] files = (new File(path)).listFiles();
                 for(File file : files){
+                    System.out.println(file.getPath());
                     TextAnnotation ta = null;
                     boolean fileread = false;
                     try {
