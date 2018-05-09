@@ -147,7 +147,7 @@ public class LORELEIRunner {
             for(String path : paths){
                 File[] files = (new File(path)).listFiles();
                 for(File file : files){
-
+                    System.out.println(file.getPath());
                     try {
                         TextAnnotation ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
                         tas.add(ta);
