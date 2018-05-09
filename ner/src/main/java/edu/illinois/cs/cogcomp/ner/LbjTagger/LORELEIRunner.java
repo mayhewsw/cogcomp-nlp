@@ -466,44 +466,44 @@ public class LORELEIRunner {
         //logger.info("Just wrote to: " + "/shared/corpora/ner/system-outputs/"+testlang+ "/projection-fa/");
 
 
-        String[] paths = datapath.split(",");
-        List<TextAnnotation> tas = new ArrayList<>();
-        for(String path : paths){
-            File[] files = (new File(path)).listFiles();
-            for(File file : files){
-                try {
-                    TextAnnotation ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
-                    tas.add(ta);
-                }catch(IllegalArgumentException e){
-                    System.out.println("Skipping: " + file);
-                }
-            }
-        }
-        Data2TextAnnotation(testData, tas);
-
-        List<String> tablines = new ArrayList<>();
-        for(TextAnnotation ta : tas){
-            if(ta.hasView(ViewNames.NER_CONLL)) {
-                View ner = ta.getView(ViewNames.NER_CONLL);
-                View roman = null;
-                if(ta.hasView(ViewNames.TRANSLITERATION)) {
-                    roman = ta.getView(ViewNames.TRANSLITERATION);
-                }
-                for (Constituent c : ner.getConstituents()) {
-                    String romanstring = c.getSurfaceForm();
-                    if(roman != null) {
-                        List<Constituent> romantoks = roman.getConstituentsCoveringSpan(c.getStartSpan(), c.getEndSpan());
-                        List<String> toks = romantoks.stream().map(Constituent::getLabel).collect(Collectors.toList());
-                        romanstring = StringUtils.join(" ", toks);
-                    }
-
-                    String menid = ta.getId() + ":" + c.getStartCharOffset() + "-" + (c.getEndCharOffset()-1);
-                    String line = String.format("Penn\t%s\t%s\t%s\tNULL\t%s\tNAM\t1.0", ta.getId(), romanstring, menid, c.getLabel());
-                    tablines.add(line);
-                }
-            }
-        }
-        LineIO.write("tabresults", tablines);
+//        String[] paths = datapath.split(",");
+//        List<TextAnnotation> tas = new ArrayList<>();
+//        for(String path : paths){
+//            File[] files = (new File(path)).listFiles();
+//            for(File file : files){
+//                try {
+//                    TextAnnotation ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
+//                    tas.add(ta);
+//                }catch(IllegalArgumentException e){
+//                    System.out.println("Skipping: " + file);
+//                }
+//            }
+//        }
+//        Data2TextAnnotation(testData, tas);
+//
+//        List<String> tablines = new ArrayList<>();
+//        for(TextAnnotation ta : tas){
+//            if(ta.hasView(ViewNames.NER_CONLL)) {
+//                View ner = ta.getView(ViewNames.NER_CONLL);
+//                View roman = null;
+//                if(ta.hasView(ViewNames.TRANSLITERATION)) {
+//                    roman = ta.getView(ViewNames.TRANSLITERATION);
+//                }
+//                for (Constituent c : ner.getConstituents()) {
+//                    String romanstring = c.getSurfaceForm();
+//                    if(roman != null) {
+//                        List<Constituent> romantoks = roman.getConstituentsCoveringSpan(c.getStartSpan(), c.getEndSpan());
+//                        List<String> toks = romantoks.stream().map(Constituent::getLabel).collect(Collectors.toList());
+//                        romanstring = StringUtils.join(" ", toks);
+//                    }
+//
+//                    String menid = ta.getId() + ":" + c.getStartCharOffset() + "-" + (c.getEndCharOffset()-1);
+//                    String line = String.format("Penn\t%s\t%s\t%s\tNULL\t%s\tNAM\t1.0", ta.getId(), romanstring, menid, c.getLabel());
+//                    tablines.add(line);
+//                }
+//            }
+//        }
+//        LineIO.write("tabresults", tablines);
 
 
         String outdatapath = modelPath + ".testdata";
