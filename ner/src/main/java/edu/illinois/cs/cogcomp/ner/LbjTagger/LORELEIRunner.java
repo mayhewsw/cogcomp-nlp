@@ -151,15 +151,19 @@ public class LORELEIRunner {
                 for(File file : files){
                     System.out.println(file.getPath());
                     TextAnnotation ta = null;
-                    boolean fileread = false;
-                    try {
-                        ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
-                    }catch (Exception e) { }
+                    String fname = file.getPath();
 
-                    try {
-                        ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath());
-                    }catch (Exception e){ }
+                    if(fname.endsWith(".byte")){
+                        try {
+                            ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath());
+                        }catch (Exception e){ }
+                    }else {
+                        try {
+                            ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
+                        } catch (Exception e) {
+                        }
 
+                    }
                     if(ta != null){
                         tas.add(ta);
                     }else{
