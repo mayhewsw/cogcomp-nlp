@@ -5,7 +5,7 @@ Illinois NER Tagger LORELEI weighted branch
 
 This relies on a [special version of LBJava](https://github.com/mayhewsw/lbjava/tree/weighted) that allows weights while training. You can download and train that one if you wish, but I strongly recommend installing the included jar: [LBJava-1.3.0-SNAPSHOT.jar](lib/LBJava-1.3.0-SNAPSHOT.jar). Install using the [install-lbjava-weighted.sh](install-lbjava-weighted.sh) command. This will also copy it to your target/dependencies folder.
 
-The main script to use is [loreleirunner.sh](scripts/loreleirunner.sh]. Just change the TRAIN/TEST/CONFIG variables in the script, and re-run. 
+The main script to use is [loreleirunner.sh](scripts/loreleirunner.sh). Just change the TRAIN/TEST/CONFIG variables in the script, and re-run. 
 
 
 ## Original README
