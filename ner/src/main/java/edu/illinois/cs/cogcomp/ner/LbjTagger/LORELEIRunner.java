@@ -456,26 +456,27 @@ public class LORELEIRunner {
 
         Decoder.annotateDataBIO(testData, tagger1, tagger2);
 
-        // Load TextAnnotations
-        String[] paths = datapath.split(",");
-        List<TextAnnotation> tas = new ArrayList<>();
-        for(String path : paths){
-            File[] files = (new File(path)).listFiles();
-            for(File file : files){
-                try {
-                    TextAnnotation ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
-                    tas.add(ta);
-                }catch(IllegalArgumentException e){
-                    System.out.println("Skipping: " + file);
+        if(outpath != null) {
+            // Load TextAnnotations
+            String[] paths = datapath.split(",");
+            List<TextAnnotation> tas = new ArrayList<>();
+            for (String path : paths) {
+                File[] files = (new File(path)).listFiles();
+                for (File file : files) {
+                    try {
+                        TextAnnotation ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
+                        tas.add(ta);
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Skipping: " + file);
+                    }
                 }
             }
-        }
-        Data2TextAnnotation(testData, tas);
 
-        // write out to file.
-        for(TextAnnotation ta : tas){
-            SerializationHelper.serializeTextAnnotationToFile(ta, outpath + "/" + ta.getId(), true);
-
+            Data2TextAnnotation(testData, tas);
+            // write out to file.
+            for (TextAnnotation ta : tas) {
+                SerializationHelper.serializeTextAnnotationToFile(ta, outpath + "/" + ta.getId(), true);
+            }
         }
 
         // It may not always make sense to get score (will often be 0), but useful anyway.
