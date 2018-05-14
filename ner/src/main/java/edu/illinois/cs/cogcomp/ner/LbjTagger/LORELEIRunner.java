@@ -155,11 +155,12 @@ public class LORELEIRunner {
                     if(fname.endsWith(".byte")){
                         try {
                             ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath());
-                        }catch (Exception e){ }
+                        }catch (Exception e){ e.printStackTrace(); }
                     }else {
                         try {
                             ta = SerializationHelper.deserializeTextAnnotationFromFile(file.getPath(), true);
                         } catch (Exception e) {
+                            e.printStackTrace();
                         }
 
                     }
