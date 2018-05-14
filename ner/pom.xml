@@ -102,7 +102,7 @@
                   <configuration>
                       <lbjavaInputFileList>
                           <param>${project.basedir}/src/main/lbj/LbjTagger.lbj</param>
-                          <param>${project.basedir}/src/main/lbj/Typer.lbj</param>
+                          <!--<param>${project.basedir}/src/main/lbj/Typer.lbj</param>-->
                       </lbjavaInputFileList>
                       <gspFlag>${project.basedir}/src/main/java</gspFlag>
                       <dFlag>${project.basedir}/target/classes</dFlag>
