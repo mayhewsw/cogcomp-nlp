@@ -66,21 +66,20 @@ public class LORELEIRunner {
                 .required()
                 .build();
 
-        Option langopt = Option.builder("lang")
+        Option outpathopt = Option.builder("outpath")
                 .hasArg()
-                .required()
                 .build();
 
         Option formatopt = Option.builder("format")
                 .hasArg()
-                .desc("Choose between reading conll files and reading from serialized TAs")
+                .desc("Choose between reading conll files and reading from JSON serialized TAs")
                 .build();
 
 
         options.addOption(help);
         options.addOption(trainpath);
         options.addOption(testpath);
-        options.addOption(langopt);
+        options.addOption(outpathopt);
         options.addOption(formatopt);
 
         options.addOption(configfile);
@@ -124,9 +123,9 @@ public class LORELEIRunner {
         // should be always... it's required.
         if(cmd.hasOption("test")){
             String testroot = cmd.getOptionValue("test");
-            String lang = cmd.getOptionValue("lang");
+            String outpath = cmd.getOptionValue("outpath");
             Data testData = loaddata(testroot, filesFormat, false);
-            Pair<Double, Double> levels  = RunTest(testData, modelpath, lang, testroot);
+            Pair<Double, Double> levels  = RunTest(testData, modelpath, testroot, outpath);
             System.out.println("Tested on: " + testroot);
         }
 
@@ -449,38 +448,14 @@ public class LORELEIRunner {
     }
 
     public static Pair<Double, Double>
-    RunTest(Data testData, String modelPath, String testlang, String datapath) throws Exception {
+    RunTest(Data testData, String modelPath, String datapath, String outpath) throws Exception {
 
         NETaggerLevel1 tagger1 = new NETaggerLevel1(modelPath + ".level1", modelPath + ".level1.lex");
         NETaggerLevel2 tagger2 = new NETaggerLevel2(modelPath + ".level2", modelPath + ".level2.lex");
 
         Decoder.annotateDataBIO(testData, tagger1, tagger2);
 
-        ArrayList<String> results = new ArrayList<>();
-        for(NERDocument doc : testData.documents) {
-            List<String> docpreds = new ArrayList<>();
-
-            ArrayList<LinkedVector> sentences = doc.sentences;
-            //results.add(doc.docname);
-            for (int k = 0; k < sentences.size(); k++){
-                for (int i = 0; i < sentences.get(k).size() ; ++i){
-                    NEWord w = (NEWord)sentences.get(k).get(i);
-                    if(!w.neLabel.equals(w.neTypeLevel2)) {
-                        results.add(w.form + " " + w.neLabel + " " + w.neTypeLevel2);
-                    }else{
-                        results.add(w.form + " " + w.neLabel + " " + w.neTypeLevel2);
-                    }
-                    docpreds.add(ACLRunner.conllline(w.neTypeLevel2, i, w.form));
-                }
-                results.add("");
-                docpreds.add("");
-            }
-
-            //LineIO.write("/shared/corpora/ner/system-outputs/"+testlang+"/projection-fa/" + doc.docname, docpreds);
-        }
-        //logger.info("Just wrote to: " + "/shared/corpora/ner/system-outputs/"+testlang+ "/projection-fa/");
-
-
+        // Load TextAnnotations
         String[] paths = datapath.split(",");
         List<TextAnnotation> tas = new ArrayList<>();
         for(String path : paths){
@@ -496,36 +471,13 @@ public class LORELEIRunner {
         }
         Data2TextAnnotation(testData, tas);
 
-        List<String> tablines = new ArrayList<>();
+        // write out to file.
         for(TextAnnotation ta : tas){
-            if(ta.hasView(ViewNames.NER_CONLL)) {
-                View ner = ta.getView(ViewNames.NER_CONLL);
-                View roman = null;
-                if(ta.hasView(ViewNames.TRANSLITERATION)) {
-                    roman = ta.getView(ViewNames.TRANSLITERATION);
-                }
-                for (Constituent c : ner.getConstituents()) {
-                    String romanstring = c.getSurfaceForm();
-                    if(roman != null) {
-                        List<Constituent> romantoks = roman.getConstituentsCoveringSpan(c.getStartSpan(), c.getEndSpan());
-                        List<String> toks = romantoks.stream().map(Constituent::getLabel).collect(Collectors.toList());
-                        romanstring = StringUtils.join(" ", toks);
-                    }
+            SerializationHelper.serializeTextAnnotationToFile(ta, outpath + "/" + ta.getId(), true);
 
-                    String menid = ta.getId() + ":" + c.getStartCharOffset() + "-" + (c.getEndCharOffset()-1);
-                    String line = String.format("Penn\t%s\t%s\t%s\tNULL\t%s\tNAM\t1.0", ta.getId(), romanstring, menid, c.getLabel());
-                    tablines.add(line);
-                }
-            }
         }
-        LineIO.write("tabresults.tab", tablines);
 
-
-        String outdatapath = modelPath + ".testdata";
-        TaggedDataWriter.writeToFile(outdatapath, testData, "-c", NEWord.LabelToLookAt.PredictionLevel2Tagger);
-
-        LineIO.write("gold-pred-" + testlang + ".txt", results);
-
+        // It may not always make sense to get score (will often be 0), but useful anyway.
         TestDiscrete resultsPhraseLevel1 = new TestDiscrete();
         resultsPhraseLevel1.addNull("O");
         TestDiscrete resultsTokenLevel1 = new TestDiscrete();
