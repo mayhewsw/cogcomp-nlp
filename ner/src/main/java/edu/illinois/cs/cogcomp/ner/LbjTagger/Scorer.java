@@ -1,32 +1,11 @@
 package edu.illinois.cs.cogcomp.ner.LbjTagger;
 
 import edu.illinois.cs.cogcomp.core.datastructures.Pair;
-import edu.illinois.cs.cogcomp.core.io.IOUtils;
-import edu.illinois.cs.cogcomp.core.io.LineIO;
-import edu.illinois.cs.cogcomp.core.utilities.StringUtils;
 import edu.illinois.cs.cogcomp.lbjava.classify.TestDiscrete;
-import edu.illinois.cs.cogcomp.lbjava.learn.*;
-import edu.illinois.cs.cogcomp.lbjava.parse.LinkedChild;
 import edu.illinois.cs.cogcomp.lbjava.parse.LinkedVector;
-import edu.illinois.cs.cogcomp.lbjava.parse.Parser;
-import edu.illinois.cs.cogcomp.lbjava.parse.WeightedParser;
-import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.ExpressiveFeaturesAnnotator;
-import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.TwoLayerPredictionAggregationFeatures;
-import edu.illinois.cs.cogcomp.ner.InferenceMethods.Decoder;
-import edu.illinois.cs.cogcomp.ner.InferenceMethods.PredictionsAndEntitiesConfidenceScores;
-import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel1;
-import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel2;
-import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.TaggedDataReader;
-import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.TaggedDataWriter;
-import edu.illinois.cs.cogcomp.ner.WordEmbedding;
 import org.apache.commons.cli.*;
-import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
 
 @SuppressWarnings("Duplicates")
 public class Scorer {

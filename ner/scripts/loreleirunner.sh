@@ -8,6 +8,8 @@ LANG=$1
 
 
 CONFIG=config/tacl/$LANG.config
+#CONFIG=config/lrlp/default.config
+
 #CONFIG=config/mono.config
 
 #TRAIN=/shared/corpora/ner/lorelei/$LANG/Train-0.25-weighted
@@ -49,7 +51,6 @@ TRAIN=/shared/corpora/corporaWeb/lorelei/evaluation-upenn-20180402/processed/il6
 #TEST=/shared/corpora/ner/lorelei/ug/All-stem-best
 #TEST=/home/mayhew/data/CALCS2018/CALCS_ENG_SPA/Dev
 TEST=/shared/corpora/ner/lorelei-swm-new/orm/All-json/
-
 
 CMD="java -classpath  ${cpath} -Xmx16g edu.illinois.cs.cogcomp.ner.LbjTagger.LORELEIRunner -train $TRAIN -test $TEST -cf $CONFIG -lang $LANG -format ta"
 
