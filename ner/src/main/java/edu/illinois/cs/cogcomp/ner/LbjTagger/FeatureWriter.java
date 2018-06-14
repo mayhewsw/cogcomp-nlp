@@ -1,34 +1,18 @@
 package edu.illinois.cs.cogcomp.ner.LbjTagger;
 
-import edu.illinois.cs.cogcomp.core.datastructures.Pair;
-import edu.illinois.cs.cogcomp.core.io.IOUtils;
 import edu.illinois.cs.cogcomp.core.io.LineIO;
-import edu.illinois.cs.cogcomp.core.utilities.StringUtils;
 import edu.illinois.cs.cogcomp.lbjava.classify.Feature;
-import edu.illinois.cs.cogcomp.lbjava.classify.TestDiscrete;
 import edu.illinois.cs.cogcomp.lbjava.learn.Lexicon;
-import edu.illinois.cs.cogcomp.lbjava.learn.SparseNetworkLearner;
 import edu.illinois.cs.cogcomp.lbjava.learn.WeightedBatchTrainer;
-import edu.illinois.cs.cogcomp.lbjava.learn.WeightedSparseAveragedPerceptron;
-import edu.illinois.cs.cogcomp.lbjava.parse.LinkedVector;
 import edu.illinois.cs.cogcomp.lbjava.parse.Parser;
-import edu.illinois.cs.cogcomp.lbjava.parse.WeightedParser;
 import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.ExpressiveFeaturesAnnotator;
-import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.TwoLayerPredictionAggregationFeatures;
-import edu.illinois.cs.cogcomp.ner.InferenceMethods.Decoder;
-import edu.illinois.cs.cogcomp.ner.InferenceMethods.PredictionsAndEntitiesConfidenceScores;
 import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel1;
-import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel2;
-import edu.illinois.cs.cogcomp.ner.ParsingProcessingData.TaggedDataWriter;
-import edu.illinois.cs.cogcomp.ner.WordEmbedding;
 import org.apache.commons.cli.*;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -181,7 +165,7 @@ public class FeatureWriter {
     }
     
 
-    public static class DataSetReader extends WeightedParser {
+    public static class DataSetReader implements Parser {
         public Data dataset = null;
         int docid = 0;
         int sentenceId =0;

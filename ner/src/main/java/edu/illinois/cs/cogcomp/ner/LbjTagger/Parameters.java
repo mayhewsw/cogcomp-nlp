@@ -11,10 +11,7 @@
 package edu.illinois.cs.cogcomp.ner.LbjTagger;
 
 import edu.illinois.cs.cogcomp.core.datastructures.ViewNames;
-import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.BrownClusters;
-import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.GazetteersFactory;
-import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.TitleTextNormalizer;
-import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.WordEmbeddings;
+import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.*;
 import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.WordEmbeddings.NormalizationMethod;
 import edu.illinois.cs.cogcomp.ner.IO.OutFile;
 import edu.illinois.cs.cogcomp.ner.LbjFeatures.NETaggerLevel1;
@@ -45,7 +42,7 @@ public class Parameters {
             "Affixes", "PreviousTag1", "PreviousTag2", "PreviousTagPatternLevel1",
             "PreviousTagPatternLevel2", "AggregateContext", "AggregateGazetteerMatches",
             "PrevTagsForContext", "PredictionsLevel1", "GazetteersFeatures", "WordEmbeddings",
-            "BrownClusterPaths", "Linkability", "Embedding", "DumbStems", "Wikifier"};
+            "BrownClusterPaths", "Linkability", "Embedding", "DumbStems", "Wikifier", "EmbedClusters"};
 
 
     /**
@@ -385,6 +382,14 @@ public class Parameters {
 
                 System.out.println(brownDebug);
 
+            }
+
+
+            // These are clustered word vectors. Each word has a cluster. Format is "integer word"
+            if (rm.containsKey("EmbedClusters")
+                    && rm.getString("EmbedClusters").equals("1")) {
+                String pathToEmbedClusters = rm.getString("pathToEmbedClusters");
+                EmbedClusters.init(pathToEmbedClusters);
             }
 
             param.randomNoiseLevel = randomNoiseLevel;
