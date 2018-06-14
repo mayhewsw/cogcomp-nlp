@@ -6,6 +6,7 @@ import edu.illinois.cs.cogcomp.ner.LbjTagger.NEWord;
 import edu.illinois.cs.cogcomp.ner.LanguageSpecificNormalizer;
 import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.WordTopicAndLayoutFeatures;
 import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.BrownClusters;
+import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.EmbedClusters;
 import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.Gazetteers;
 import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.WordEmbeddings;
 import edu.illinois.cs.cogcomp.ner.LbjTagger.ParametersForLbjCode;
@@ -423,7 +424,7 @@ discrete% DumbStems(NEWord word) <-
 discrete% BrownClusterPaths(NEWord word) <-
 {
   	if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("BrownClusterPaths"))
-	{ 
+	{
 		BrownClusters bc = BrownClusters.get();
   		int i;
   		NEWord w = word, last = word;
@@ -438,6 +439,26 @@ discrete% BrownClusterPaths(NEWord word) <-
   		}
 	}
 }
+
+// Problem 1
+discrete% EmbedClustersFeat(NEWord word) <-
+{
+    if(ParametersForLbjCode.currentParameters.featuresToUse.containsKey("EmbedClusters"))
+    {
+		EmbedClusters bc = EmbedClusters.get();
+		int i;
+		NEWord w = word, last = word;
+		for (i = 0; i <= 1 && last != null; ++i) last = (NEWord) last.next;
+		for (i = 0; i > -1 && w.previous != null; --i) w = (NEWord) w.previous;
+
+		for (; w != last; w = (NEWord) w.next){
+		    String clus = bc.getCluster(w);
+		    sense i : clus;
+		    i++;
+		}
+	}
+}
+
 
 
 // Problem 1
@@ -687,7 +708,7 @@ discrete% PreviousTagPatternLevel1(NEWord word) <-
 
 
 // Used to have IsSentenceStart here.
-mixed% FeaturesSharedTemp(NEWord word) 	<- Capitalization, nonLocalFeatures, GazetteersFeatures, FormParts, Forms,  WordTypeInformation, Affixes, BrownClusterPaths, WordEmbeddingFeatures, posTag, wikifierFeats, PrevEmbedding, NextEmbedding, CurrentEmbedding, DumbStems
+mixed% FeaturesSharedTemp(NEWord word) 	<- Capitalization, nonLocalFeatures, GazetteersFeatures, FormParts, Forms,  WordTypeInformation, Affixes, BrownClusterPaths, EmbedClustersFeat, WordEmbeddingFeatures, posTag, wikifierFeats, PrevEmbedding, NextEmbedding, CurrentEmbedding, DumbStems
 
 
 mixed% FeaturesLevel1SharedWithLevel2(NEWord word)  <- FeaturesSharedTemp /*,  IsWordCaseNormalized&&FeaturesSharedTemp*/
