@@ -469,7 +469,7 @@ public class LORELEIRunner {
             Data2TextAnnotation(testData, tas);
             // write out to file.
             for (TextAnnotation ta : tas) {
-                SerializationHelper.serializeTextAnnotationToFile(ta, outpath + "/" + ta.getId(), true);
+                SerializationHelper.serializeTextAnnotationToFile(ta, outpath + "/" + ta.getId(), true, true);
             }
         }
 
