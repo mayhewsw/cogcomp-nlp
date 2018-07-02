@@ -36,8 +36,8 @@ CONFIG=config/lrlp/$LANG.config
 #TRAIN=/shared/corpora/ner/lorelei/om/Train
 #TRAIN=/shared/corpora/ner/eval/column/Train-weighted
 #TRAIN=/home/mayhew/data/CALCS2018/CALCS_ENG_SPA/Train
-#TRAIN=/shared/corpora/ner/lorelei-swm-new/swa/Train
-TRAIN=/shared/corpora/corporaWeb/lorelei/evaluation-upenn-20180402/swa/ner/json-swa-annotation-with-rules/
+#TRAIN=/shared/corpora/ner/lorelei-swm-new/tir/Train
+TRAIN=/shared/corpora/corporaWeb/lorelei/evaluation-upenn-20180402/il5/ner/train-2017/All
 
 #TEST=/shared/corpora/ner/lorelei/$LANG/Train-0.25-weighted
 #TEST=/shared/corpora/ner/lorelei/om/Test
@@ -49,14 +49,14 @@ TRAIN=/shared/corpora/corporaWeb/lorelei/evaluation-upenn-20180402/swa/ner/json-
 #TEST=/home/mayhew/data/broad_twitter_corpus/setH2
 #TEST=/shared/corpora/ner/lorelei/ug/All-stem-best
 #TEST=/home/mayhew/data/CALCS2018/CALCS_ENG_SPA/Dev
-TEST=/shared/corpora/ner/lorelei-swm-new/swa/Test
+TEST=/shared/corpora/ner/lorelei-swm-new/tir/Test
 #TEST=/shared/corpora/corporaWeb/lorelei/evaluation-upenn-20180402/tha/processed/setE-anno
 #TEST=/shared/corpora/corporaWeb/lorelei/evaluation-upenn-20180402/tha/ner/mono-select-all-rules/
 
-OUTPATH=/shared/corpora/corporaWeb/lorelei/evaluation-upenn-20180402/swa/ner/test-out-rules
+OUTPATH=/shared/corpora/corporaWeb/lorelei/evaluation-upenn-20180402/swa/ner/test-out
 mkdir -p $OUTPATH
-CMD="java -classpath  ${cpath} -Xmx16g edu.illinois.cs.cogcomp.ner.LbjTagger.LORELEIRunner -train $TRAIN -test $TEST -cf $CONFIG -outpath $OUTPATH -format ta"
-#CMD="java -classpath  ${cpath} -Xmx16g edu.illinois.cs.cogcomp.ner.LbjTagger.LORELEIRunner -train $TRAIN -test $TEST -cf $CONFIG -format ta"
+#CMD="java -classpath  ${cpath} -Xmx16g edu.illinois.cs.cogcomp.ner.LbjTagger.LORELEIRunner -train $TRAIN -test $TEST -cf $CONFIG -outpath $OUTPATH -format ta"
+CMD="java -classpath  ${cpath} -Xmx16g edu.illinois.cs.cogcomp.ner.LbjTagger.LORELEIRunner -train $TRAIN -test $TEST -cf $CONFIG -format ta"
 
 
 
