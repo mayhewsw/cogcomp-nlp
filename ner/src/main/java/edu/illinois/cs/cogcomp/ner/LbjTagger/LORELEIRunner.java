@@ -8,6 +8,7 @@ import edu.illinois.cs.cogcomp.core.io.IOUtils;
 import edu.illinois.cs.cogcomp.core.utilities.SerializationHelper;
 import edu.illinois.cs.cogcomp.lbjava.classify.TestDiscrete;
 import edu.illinois.cs.cogcomp.lbjava.learn.*;
+import edu.illinois.cs.cogcomp.lbjava.nlp.Word;
 import edu.illinois.cs.cogcomp.lbjava.parse.LinkedVector;
 import edu.illinois.cs.cogcomp.lbjava.parse.Parser;
 import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.ExpressiveFeaturesAnnotator;
@@ -212,6 +213,12 @@ public class LORELEIRunner {
                 lemma = ta.getView(ViewNames.LEMMA);
             }
 
+            // this added by CBL
+            View weights = null;
+            if(ta.hasView("WEIGHTS")){
+                weights = ta.getView("WEIGHTS");
+            }
+
             int[] tokenindices = new int[tokens.length];
             int tokenIndex = 0;
             int neWordIndex = 0;
@@ -252,7 +259,21 @@ public class LORELEIRunner {
                     }
 
                     if (w.length() > 0) {
-                        NEWord.addTokenToSentence(words, w, tag);
+                        //NEWord.addTokenToSentence(words, w, tag);
+
+                        NEWord word=new NEWord(new Word(w),null,tag);
+
+                        double weight;
+                        if(weights != null){
+                            Constituent weightcons = weights.getConstituentsCoveringToken(tokenid).get(0);
+                            weight = Double.parseDouble(weightcons.getLabel());
+                        }else{
+                            weight = 1.;
+                        }
+                        word.setWeight(weight);
+                        NEWord.addTokenToSentence(words, word);
+
+
                         tokenindices[neWordIndex] = tokenIndex;
                         neWordIndex++;
                     } else {
