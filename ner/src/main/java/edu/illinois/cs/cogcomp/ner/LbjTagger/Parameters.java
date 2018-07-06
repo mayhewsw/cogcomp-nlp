@@ -344,6 +344,13 @@ public class Parameters {
 
             }
 
+            if (rm.containsKey("pathToLM")) {
+                CharLangModel.init(rm.getString("pathToLM"));
+            }
+            else {
+                CharLangModel.init();
+            }
+
             // BrownClusterPaths feature
             String brownDebug = "";
             if (rm.containsKey("BrownClusterPaths")

@@ -442,8 +442,7 @@ public class LORELEIRunner {
         tagger2.save();
     }
 
-    public static Pair<Double, Double>
-    RunTest(Data testData, String modelPath, String datapath, String outpath) throws Exception {
+    public static Pair<Double, Double> RunTest(Data testData, String modelPath, String datapath, String outpath) throws Exception {
 
         NETaggerLevel1 tagger1 = new NETaggerLevel1(modelPath + ".level1", modelPath + ".level1.lex");
         NETaggerLevel2 tagger2 = new NETaggerLevel2(modelPath + ".level2", modelPath + ".level2.lex");

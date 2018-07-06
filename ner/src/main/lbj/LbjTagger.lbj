@@ -2,6 +2,7 @@ package edu.illinois.cs.cogcomp.ner.LbjFeatures;
 
 import java.util.*;
 
+import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.CharLangModel;
 import edu.illinois.cs.cogcomp.ner.LbjTagger.NEWord;
 import edu.illinois.cs.cogcomp.ner.LanguageSpecificNormalizer;
 import edu.illinois.cs.cogcomp.ner.ExpressiveFeatures.WordTopicAndLayoutFeatures;
@@ -15,6 +16,59 @@ import edu.illinois.cs.cogcomp.ner.WordEmbedding;
 
   
 //---------------- CLASSIFIER LEVEL 1 -------------------
+
+discrete{false, true}% CharLangModelPrediction_context(NEWord word) <-
+		{
+		CharLangModel charlm = CharLangModel.get();
+		int i;
+		NEWord w = word, last = word;
+		for (i = 0; i <= 2 && last != null; ++i) last = (NEWord) last.next;
+		for (i = 0; i > -2 && w.previous != null; --i) w = (NEWord) w.previous;
+		for (; w != last; w = (NEWord) w.next){
+		Double isEntity_L = charlm.getEntity_L(w);
+		Double isNotEntity_L = charlm.getNotEntity_L(w);
+		Double isEntity_U = charlm.getEntity_U(w);
+		Double isNotEntity_U = charlm.getNotEntity_U(w);
+
+		//if( Double.compare(isEntity_L, isNotEntity_L) < 0 && Double.compare(isEntity_L, 25.00) < 0 )
+		//    sense i+"L_Threshold" : true;
+		//else
+		//    sense i+"L_Threshold": false;
+
+		if( Double.compare(isEntity_L, isNotEntity_L) < 0 )
+		sense i+"L_NoThreshold" : true;
+		else
+		sense i+"L_NoThreshold" : false;
+
+		//if( Double.compare(isEntity_U, isNotEntity_U) < 0 && Double.compare(isEntity_U, 40.00) < 0 )
+		//    sense i+"U_Threshold" : true;
+		//else
+		//    sense i+"U_Threshold": false;
+
+        /*if( Double.compare(isEntity_U, isNotEntity_U) < 0 && w.form.length() > 1)
+            sense i+"U_NoThreshold" : true;
+        else {
+            /*if (w.form == w.form.toUpperCase() && w.form != w.form.toLowerCase() && w.form.length() > 1) {
+                NEWord nw = w;
+                nw.form = w.form.charAt(0) + w.form.substring(1).toLowerCase();
+                Double isNewEntity_U = charlm.getEntity_U(w);
+                Double isNewNotEntity_U = charlm.getNotEntity_U(w);
+                if( Double.compare(isNewEntity_U, isNewNotEntity_U) < 0)
+                    sense i+"U_NoThreshold" : true;
+                else
+                    sense i+"U_NoThreshold" : false;
+            }
+            else {*/
+		sense i+"U_NoThreshold" : false;
+		//}
+		}*/
+
+		i++;
+		}
+		}
+
+
+
 
 discrete% posTag(NEWord word) <-
 {
@@ -708,8 +762,7 @@ discrete% PreviousTagPatternLevel1(NEWord word) <-
 
 
 // Used to have IsSentenceStart here.
-mixed% FeaturesSharedTemp(NEWord word) 	<- Capitalization, nonLocalFeatures, GazetteersFeatures, FormParts, Forms,  WordTypeInformation, Affixes, BrownClusterPaths, EmbedClustersFeat, WordEmbeddingFeatures, posTag, wikifierFeats, PrevEmbedding, NextEmbedding, CurrentEmbedding, DumbStems
-
+mixed% FeaturesSharedTemp(NEWord word) 	<- Capitalization, nonLocalFeatures, GazetteersFeatures, FormParts, Forms,  WordTypeInformation, Affixes, BrownClusterPaths, EmbedClustersFeat, WordEmbeddingFeatures, posTag, wikifierFeats, PrevEmbedding, NextEmbedding, CurrentEmbedding, DumbStems,CharLangModelPrediction_context
 
 mixed% FeaturesLevel1SharedWithLevel2(NEWord word)  <- FeaturesSharedTemp /*,  IsWordCaseNormalized&&FeaturesSharedTemp*/
 
