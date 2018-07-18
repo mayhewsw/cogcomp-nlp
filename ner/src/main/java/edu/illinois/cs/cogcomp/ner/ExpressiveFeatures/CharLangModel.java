@@ -387,20 +387,28 @@ public class CharLangModel {
 //        System.out.println(w.form);
 //        System.out.println(Entity.get(w.form));
         Double ppl = Entity_L.get(w.form);
-        if (ppl != null)
-            return Entity_L.get(w.form);
-        else
-            return 100.0;
+        
+        if (ppl == null || w.form.length() < 5)
+            ppl = 1000.0;
+        
+        //System.out.println("Entity_L: " + w.form + ", " + ppl);
+        
+        return ppl;
     }
 
     final public Double getNotEntity_L(NEWord w) {
 //        System.out.println(w.form);
 //        System.out.println(NotEntity.get(w.form));
         Double ppl = NotEntity_L.get(w.form);
-        if (ppl != null)
-            return NotEntity_L.get(w.form);
-        else
-            return 1.0;
+
+        
+        if (ppl == null)
+            ppl = 1.0;
+
+        //System.out.println("NotEntity_L: " + w.form + ", " + ppl);
+        return ppl;
+
+        
     }
 
     final public Double getEntity_U(NEWord w) {
