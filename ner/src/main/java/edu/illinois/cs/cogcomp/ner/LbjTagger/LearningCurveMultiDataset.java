@@ -144,11 +144,11 @@ public class LearningCurveMultiDataset {
 
         NETaggerLevel1.Parameters paramLevel1 = new NETaggerLevel1.Parameters();
         paramLevel1.baseLTU = new SparseAveragedPerceptron(
-            params.learningRatePredictionsLevel1, 0, 
-            params.thicknessPredictionsLevel1);
+                params.learningRatePredictionsLevel1, 0,
+                params.thicknessPredictionsLevel1);
         paramLevel1.baseLTU.featurePruningThreshold = params.featurePruningThreshold;
         logger.info("Level 1 classifier learning rate = "+params.learningRatePredictionsLevel1+
-            ", thickness = "+params.thicknessPredictionsLevel1);
+                ", thickness = "+params.thicknessPredictionsLevel1);
 
         NETaggerLevel1 tagger1 =
                 new NETaggerLevel1(paramLevel1, modelPath + ".level1", modelPath + ".level1.lex");
